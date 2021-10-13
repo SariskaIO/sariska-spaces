@@ -35,6 +35,7 @@ export const space = (state=initialState, action) => {
         case SET_CO_HOST:
             if(action.payload.cohost){
                 state.coHosts.push(action.payload.participantId);
+                state.type.cohost = true;
             }
             return {...state};
         case MAKE_SPEAKER:
@@ -46,6 +47,7 @@ export const space = (state=initialState, action) => {
         case MAKE_LISTENER:
             if(action.payload.listener){
                 state.listeners.push(action.payload.participantId);
+                state.type.listener = true;
             }
             return {...state};
         case SELECT_PARTICIPANT_TYPE:

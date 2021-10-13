@@ -18,6 +18,7 @@ import { setRaiseHand } from '../../store/actions/layout';
 import ReconnectDialog from '../../components/shared/ReconnectDialog';
 import { useParams } from 'react-router-dom';
 import { makeListeners, makeSpeakers, setCoHosts, setHost } from '../../store/actions/space';
+import { Snackbar } from '@mui/material';
 
 const Space = () => {
 
@@ -31,12 +32,13 @@ const Space = () => {
     const [dominantSpeakerId, setDominantSpeakerId] = useState(null);
     const [lobbyUserJoined, setLobbyUserJoined] = useState({});
     const [minimize, setMinimize] = useState(false);
+    const [roleChanged, setRoleChanged] = useState(false);
+    const [message, setMessage] = useState(false);
     const queryParams = useParams();
     const query = useQuery();
     const urlSearchParams = new URLSearchParams(window.location.search);
     let spaceType = Object.fromEntries(urlSearchParams?.entries())?.private;
 
-    console.log('sapce', queryParams);
     
     const handleMinimize = ()=> {
         setMinimize(!minimize);
@@ -86,20 +88,26 @@ const Space = () => {
             return;
         }
         [...conference.getParticipantsWithoutHidden()].forEach(item=>{
-            console.log('rofpt', item)
             if (item._properties?.handraise === "start") {
                 dispatch(setRaiseHand({ participantId: item._id, raiseHand: true}));
             }
             if(item._properties?.host === "true"){
-                console.log('setlocal1', !queryParams.spaceId, item._properties, item, conference.getParticipantsWithoutHidden());
                 dispatch(setHost({participantId: item._id, host: "true"}));
+            }
+            if(item._properties?.cohost === "true"){
+                dispatch(setCoHosts({participantId: item._id, cohost: "true"}));
+            }
+            if(item._properties?.speaker === "true"){
+                dispatch(makeSpeakers({participantId: item._id, speaker: "true"}));
+            }
+            if(item._properties?.listener === "true"){
+                dispatch(makeListeners({participantId: item._id, listener: "true"}));
             }
         });
         conference.addEventListener(SariskaMediaTransport.events.conference.TRACK_ADDED, (track) => {
             if (track.isLocal()) {
                 return;
             }
-            console.log('bollyadded', track)
             dispatch(addRemoteTrack(track));
         });
         conference.addEventListener(SariskaMediaTransport.events.conference.TRACK_REMOVED, (track) => {
@@ -136,11 +144,29 @@ const Space = () => {
             }
         });
 
-        conference.addEventListener(SariskaMediaTransport.events.conference.USER_ROLE_CHANGED, (id) => {
+        conference.addEventListener(SariskaMediaTransport.events.conference.USER_ROLE_CHANGED, (id, role) => {
             if (conference.isModerator()) {
                 conference.enableLobby();
             }
+            if(conference.user.id){
+                setRoleChanged(true);
+                setMessage(`My Role changed, new role is :  ${role}`)
+            }else {
+                setRoleChanged(true);
+                setMessage(`Participant ${id} Role changed, new role is : ${role}`)
+            }
+
         });
+
+        conference.addEventListener(SariskaMediaTransport.events.conference.KICKED, (id)=> { // if a user kicked by moderator 
+            // kicked participant id
+            alert(`${id} has been removed`);
+          });
+
+        conference.addEventListener(SariskaMediaTransport.events.conference.PARTICIPANT_KICKED, (actorParticipant, kickedParticipant, reason) => {
+            alert(`${actorParticipant} has removed ${kickedParticipant} for ${reason}`);
+        })
+
         conference.addEventListener(SariskaMediaTransport.events.conference.LOBBY_USER_JOINED, (id, displayName) => {
             new Audio("https://sdk.sariska.io/knock_0b1ea0a45173ae6c10b084bbca23bae2.ogg").play();
             setLobbyUserJoined({id, displayName});
@@ -184,7 +210,6 @@ const Space = () => {
     if (!conference || !conference.isJoined()) {
         return <Home />;
     }
-    console.log('slop', profile, spaceType===true, lobbyUserJoined.id, spaceType && lobbyUserJoined.id);
     return (
         <div>
             {!minimize && <ParticipantsGrid dominantSpeakerId={dominantSpeakerId} handleMinimize={handleMinimize} />}
@@ -195,6 +220,15 @@ const Space = () => {
             <ParticipantsSummary handleMinimize={handleMinimize}/>
             <SnackbarBox notification={notification}/>
             <ReconnectDialog open={layout.disconnected}/>
+            <Snackbar
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                }}
+                autoHideDuration={2000}
+                open={roleChanged}
+                message="Conference access denied by moderator"
+            />
         </div>
     )
 }

@@ -28,7 +28,6 @@ const SpaceFooterActions = () => {
     const [muteAll, setMuteAll] = useState(false);
     const [audioTrack] = useSelector(state => state.localTrack);
     const [raiseHand, setRaiseHand] = useState(false);
-    const [copySuccess, setCopySuccess] = React.useState('Copy');
     const conference = useSelector(state=>state.conference);
     const dispatch = useDispatch()
     const queryParams = useParams()
@@ -41,14 +40,11 @@ const SpaceFooterActions = () => {
   const startRaiseHand = () => {
     conference.setLocalParticipantProperty("handraise", "start");
     setRaiseHand(true);
-    console.log('hand raise', raiseHand);
 };
 const stopRaiseHand = () => {
     conference.setLocalParticipantProperty("handraise", "stop");
     setRaiseHand(false);
-    console.log('hand stop', raiseHand);
 };
-console.log('hand out', raiseHand);
   const handleMuteClick = () => {
     setMute(!mute)
   };
@@ -75,10 +71,6 @@ const handleManageSpace = () => {
   const history = useHistory();
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setCopySuccess("Copy");
-    setAnchorEl(null);
   };
 
   return (
@@ -110,7 +102,7 @@ const handleManageSpace = () => {
           <ShareOutlinedIcon />
         </StyledFab>
       </Tooltip>
-      <SettingsMenu anchorEl={anchorEl} open={open} handleClose={handleClose} copySuccess={copySuccess} setCopySuccess={setCopySuccess} />
+      <SettingsMenu anchorEl={anchorEl} setAnchorEl={setAnchorEl} open={open} />
     </Stack>
   );
 };

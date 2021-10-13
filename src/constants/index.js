@@ -3,13 +3,13 @@ export const GENERATE_TOKEN_URL = "https://api.sariska.io/api/v1/misc/generate-t
 
 export const USER_ROLE = {
     HOST : "HOST",
-    CO_HOST : "CO_HOST",
+    CO_HOST : "COHOST",
     SPEAKER : "SPEAKER",
     LISTENER : "LISTENER"
 }
 export const USER_SCREEN = {
-    HOST : "HOST",
-    CO_HOST : "CO_HOST",
-    SPEAKER : "SPEAKER",
-    LISTENER : "LISTENER"
+    HOST : "host",
+    CO_HOST : "cohost",
+    SPEAKER : "speaker",
+    LISTENER : "listener"
 }

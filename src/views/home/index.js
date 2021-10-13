@@ -18,12 +18,13 @@ const Home = () => {
   const queryParams = useParams();
   const urlSearchParams = new URLSearchParams(window.location.search);
   let spaceType = Object.fromEntries(urlSearchParams?.entries())?.private;
+  let userRole = Object.fromEntries(urlSearchParams?.entries())?.role;
   SariskaMediaTransport.initialize();
   SariskaMediaTransport.setLogLevel(SariskaMediaTransport.logLevels.Error); //TRACE, DEBUG, INFO, LOG, WARN, ERROR
 
   const handleSetTerms = () => {
     if(queryParams.spaceId){
-      history.push(`/terms/${queryParams.spaceId}?private=${spaceType}`);
+      history.push(`/terms/${queryParams.spaceId}?private=${spaceType}&role=${userRole}`);
     }else{
       history.push('/terms');
     }

@@ -13,6 +13,7 @@ import ContentBox from '../../components/shared/ContentBox';
 import CloseOnlyDialogueHeader from '../../components/shared/CloseOnlyDialogueHeader';
 import { clearAllTokens } from '../../utils';
 import { addLocalTrack } from '../../store/actions/track';
+import { USER_SCREEN } from '../../constants';
 
 const StyledBox = styled(Box)(({theme})=>({
     paddingTop: theme.spacing(2)
@@ -32,6 +33,7 @@ const SpaceTerms = () => {
     const type = useSelector(state=>state.space.type);
     const urlSearchParams = new URLSearchParams(window.location.search);
     let spaceType = Object.fromEntries(urlSearchParams?.entries())?.private;
+    let userRole = Object.fromEntries(urlSearchParams?.entries())?.role;
 
     const options = {
     devices: ["audio"],
@@ -42,7 +44,6 @@ const SpaceTerms = () => {
     const newLocalTracks = await SariskaMediaTransport?.createLocalTracks(
       options
     );
-    console.log("newlocal", newLocalTracks);
     setLocalTracks(newLocalTracks);
     newLocalTracks?.forEach((track) => dispatch(addLocalTrack(track)));
   };
@@ -50,7 +51,7 @@ const SpaceTerms = () => {
   const handleTerms = () => {
     !type.listener && createNewLocalTracks();
     if(queryParams.spaceId){
-        history.push(`/start/${queryParams.spaceId}?private=${spaceType}`);
+        history.push(`/start/${queryParams.spaceId}?private=${spaceType}&role=${userRole}`);
       }else{
         history.push('/start');
       }

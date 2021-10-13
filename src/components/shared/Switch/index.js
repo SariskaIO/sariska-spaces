@@ -88,7 +88,6 @@ export default function Switches({disabled, checked, setChecked}) {
   const handleChange = (event) => {
     setChecked(event.target.checked);
   };
-  console.log('swch1', checked);
   
   return (
     <StyledFormControl component="fieldset">

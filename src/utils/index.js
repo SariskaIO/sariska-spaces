@@ -47,7 +47,6 @@ export function createDeferred() {
 
 
 export async function getToken(roomName, profile, name,  isModerator) {
-    console.log('tokpro', profile, name, isModerator)
     const body = {
         method: "POST",
         headers: {
@@ -179,13 +178,11 @@ export function preloadIframes(conference) {
 
 export const getUserName = (list, id) => {
     let user = list.filter((item)=>item.id == id);
-    console.log('prep', id)
     return user[0]?.name;
 }
 
 export const getUserRole = (list, id) => {
     let user = list.filter((item)=>item.id == id);
-    console.log('prep', id)
     return user[0]?.role;
 }
 

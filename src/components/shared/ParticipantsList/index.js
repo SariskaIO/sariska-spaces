@@ -1,6 +1,6 @@
 import { Box, Stack, styled, Typography } from "@mui/material";
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { color } from "../../../assets/colors";
 import { USER_ROLE } from "../../../constants";
 import { localParticipantData } from "../../../data";
@@ -8,6 +8,7 @@ import { getUserProfile } from "../../../utils";
 import AvatarBox from "../AvatarBox";
 import ContextMenu from "../ContextMenu";
 //import CaptionBox from '../../../shared/CaptionBox';
+import {localTrackMutedChanged, remoteTrackMutedChanged} from '../../../store/actions/track';
 
 const Title = styled(Typography)(() => ({
   fontWeight: 600,
@@ -34,6 +35,7 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
   const [contextCoHostMenu, setContextCoHostMenu] = React.useState(null);
   const [contextSpeakerMenu, setContextSpeakerMenu] = React.useState(null);
   const [contextListenerMenu, setContextListenerMenu] = React.useState(null);
+  const [participantId, setParticipantId] = useState('');
   const spaceTitle = useSelector((state) => state.profile?.spaceTitle);
   const profile = useSelector((state) => state.profile);
   const conference = useSelector((state) => state.conference);
@@ -42,6 +44,10 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
   const localUser = conference.getLocalUser();
   const space = useSelector((state) => state.space);
   const layout = useSelector((state) => state.layout.raisedHandParticipantIds);
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  let userRole = Object.fromEntries(urlSearchParams?.entries())?.role;
+  const dispatch = useDispatch();
+  const [audioTrack] = localTracks;
 
   //merge local and remote track
   let tracks = {
@@ -52,8 +58,8 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
   const participantIds = Object.keys(tracks);
   console.log("numpr", space.host, space, layout);
 
-  const handleContextHostMenu = (event) => {
-    event.preventDefault();
+  const handleContextHostMenu = (event, id) => {
+    setParticipantId(id);
     setContextHostMenu(
       contextHostMenu === null
         ? {
@@ -67,8 +73,8 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
     );
   };
 
-  const handleContextCoHostMenu = (event) => {
-    event.preventDefault();
+  const handleContextCoHostMenu = (event, id) => {
+    setParticipantId(id);
     setContextCoHostMenu(
       contextCoHostMenu === null
         ? {
@@ -81,8 +87,8 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
           null
     );
   };
-  const handleContextSpeakerMenu = (event) => {
-    event.preventDefault();
+  const handleContextSpeakerMenu = (event, id) => {
+    setParticipantId(id);
     setContextSpeakerMenu(
       contextSpeakerMenu === null
         ? {
@@ -91,9 +97,10 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
           }
         : null
     );
+    console.log('id is', id)
   };
-  const handleContextListenerMenu = (event) => {
-    event.preventDefault();
+  const handleContextListenerMenu = (event, id) => {
+    setParticipantId(id);
     setContextListenerMenu(
       contextListenerMenu === null
         ? {
@@ -105,20 +112,83 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
   };
 
   const handleHostMenuClose = (text) => {
+    if(participantId && (text === " Mute") && (userRole.toUpperCase() === USER_ROLE.HOST)){
+        audioTrack.mute();
+        dispatch(localTrackMutedChanged());
+  }
     setContextHostMenu(null);
+    
   };
-
+  
   const handleCoHostMenuClose = (text) => {
+    if(participantId){
+    if(text === "Make Speaker"){
+      conference.revokeOwner(participantId)
+    }
+    if(text === "Mute"){
+      if(userRole.toUpperCase() === USER_ROLE.HOST){
+        conference.muteParticipant(participantId, 'audio');
+        dispatch(remoteTrackMutedChanged());
+      }
+      if(userRole.toUpperCase() === USER_ROLE.CO_HOST){
+        audioTrack.mute();
+        dispatch(localTrackMutedChanged());
+      }
+    }
+    if(text === "Remove Co-host"){
+      conference.kickParticipant(participantId, "Removing Co-host");
+    }
+  }
     setContextCoHostMenu(null);
   };
   const handleSpeakerMenuClose = (text) => {
-    setContextCoHostMenu(null);
+    if(participantId){
+      if(text === "Make Co-host") {
+        conference.grantOwner(participantId)
+      }
+      if(text === "Make Listener") {
+        console.log('make listener');
+      }
+      if(text === "Mute") {
+        if((userRole.toUpperCase() === USER_ROLE.HOST) || (userRole.toUpperCase() === USER_ROLE.CO_HOST) ){
+          conference.muteParticipant(participantId, 'audio');
+          dispatch(remoteTrackMutedChanged());
+        }
+        if(userRole.toUpperCase() === USER_ROLE.SPEAKER){
+          audioTrack.mute();
+          dispatch(localTrackMutedChanged());
+        }
+      }
+      if(text === "Remove Speaker") {
+        conference.kickParticipant(participantId);
+      }
+    }
+      setContextSpeakerMenu(null);
   };
   const handleListenerMenuClose = (text) => {
-    setContextCoHostMenu(null);
+    if(participantId){
+      if(text === "Make Speaker") {
+        console.log('Make')
+      }
+      if(text === "Mute") {
+        if((userRole.toUpperCase() === USER_ROLE.HOST) || (userRole.toUpperCase() === USER_ROLE.CO_HOST)){
+          conference.muteParticipant(participantId, 'audio');
+          dispatch(remoteTrackMutedChanged());
+        }
+        if(userRole.toUpperCase() === USER_ROLE.LISTENER){
+          audioTrack.mute();
+          dispatch(localTrackMutedChanged());
+        }
+      }
+      if(text === "Remove Listener") {
+        conference.kickParticipant(participantId);
+      }
+    }
+    setContextListenerMenu(null);
   };
 
   const handleClose = () => {
+
     setContextCoHostMenu(null);
     setContextSpeakerMenu(null);
     setContextListenerMenu(null);
@@ -130,68 +200,57 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
   //     setContextCoHost(null);
   //   };
 
-  const hostMenu = [
-    { title: "Turn into Co-host" },
-    { title: "Mute" },
-    // host: [
-    // {title: 'Turn into Co-host'},
-    // {title: 'Mute'}
-    // ]
-  ];
-  const coHostMenu = [
-    { title: "Make Host" },
-    { title: "Make Speaker" },
-    { title: "Mute" },
-    { title: "Remove Co-host" },
-  ];
-  // host: [
-  //   {title: 'Make Host'},
-  //   {title: 'Make Speaker'},
-  //   {title: 'Mute'},
-  //   {title: 'Remove Co-host'}
-  // ],
-  // cohost: [
-  //   {title: 'Mute'},
-  // ]
+  const hostMenu = {
+    host: [
+    {title: 'Turn into Co-host'},
+    {title: 'Mute'}
+    ]
+  };
+  const coHostMenu = {
+  host: [
+    {title: 'Make Host'},
+    {title: 'Make Speaker'},
+    {title: 'Mute'},
+    {title: 'Remove Co-host'}
+  ],
+  cohost: [
+    {title: 'Mute'},
+  ]
+}
 
-  const speakerMenu = [
-    { title: "Make Co-host", onClick: (id) => conference.grantOwner(id) },
-    { title: "Make Listener" },
-    { title: "Mute" },
-    { title: "Remove Speaker" },
-    // host: [
-    // {title: 'Make Co-host', onClick: (id)=>conference.grantOwner(id)},
-    // {title: 'Make Listener'},
-    // {title: 'Mute'},
-    // {title: 'Remove Speaker'}
-    // ],
-    // cohost: [
-    // {title: 'Make Listener'},
-    // {title: 'Mute'},
-    // {title: 'Remove Speaker'}
-    // ],
-    // speaker: [
-    //   {title: 'Mute'},
-    // ]
-  ];
-  const listenerMenu = [
-    { title: "Make Speaker" },
-    { title: "Mute" },
-    { title: "Remove Listener" },
-  ];
-  // host: [
-  //   {title: 'Make Speaker'},
-  //   {title: 'Mute'},
-  //   {title: 'Remove Listener'}
-  // ],
-  // cohost: [
-  //   {title: 'Make Speaker'},
-  //   {title: 'Mute'},
-  //   {title: 'Remove Listener'}
-  // ],
-  // listenr: [
-  //   {title: 'Mute'},
-  // ]
+  const speakerMenu = {
+    host: [
+    {title: 'Make Co-host', onClick: (id)=>conference.grantOwner(id)},
+    {title: 'Make Listener'},
+    {title: 'Mute'},
+    {title: 'Remove Speaker'}
+    ],
+    cohost: [
+    {title: 'Make Listener'},
+    {title: 'Mute'},
+    {title: 'Remove Speaker'}
+    ],
+    speaker: [
+      {title: 'Mute'},
+    ]
+  };
+  const listenerMenu = {
+  host: [
+    {title: 'Make Speaker'},
+    {title: 'Mute'},
+    {title: 'Remove Listener'}
+  ],
+  cohost: [
+    {title: 'Make Speaker'},
+    {title: 'Mute'},
+    {title: 'Remove Listener'}
+  ],
+  listener: [
+    {title: 'Mute'},
+  ]
+}
+
+console.log('cohotsm', userRole.toUpperCase(), USER_ROLE.HOST, coHostMenu?.host, userRole.toUpperCase() === USER_ROLE.HOST, userRole.toUpperCase() === USER_ROLE.CO_HOST, USER_ROLE.CO_HOST, coHostMenu?.cohost);
 
   return (
     <Box>
@@ -205,7 +264,7 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
               _id: localUser.id,
               _role: "moderator",
             },
-          ].map((participant, index) => {
+          ]?.map((participant, index) => {
             console.log(
               "party",
               participant._id === space.host,
@@ -214,11 +273,10 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
               participant,
               profile
             );
-
-            console.log("party1", space.host, );
+            let id = participant._id;
             return tracks[participantIds[index]] ? (
               <>
-                {space.type.host && participant._id === space.host && (
+                {space.type.host && id === space.host && (
                   <AvatarBox
                     role={USER_ROLE.HOST}
                     key={index}
@@ -229,14 +287,12 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
                     participantTracks={tracks[participantIds[index]]}
                     localUserId={conference.myUserId()}
                     onClick={
-                      participant._role === USER_ROLE.HOST &&
-                      handleContextHostMenu
+                      (e)=>handleContextHostMenu(e,id)
                     }
                   />
                 )}
                 { space.type.cohost &&
-                  participant._id ===
-                    space.cohosts.filter((item) => item === participant._id)[0] && (
+                  id === space.coHosts.filter((item) => item === id)[0] && (
                   <AvatarBox
                     role={USER_ROLE.CO_HOST}
                     key={index}
@@ -247,15 +303,13 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
                     participantTracks={tracks[participantIds[index]]}
                     localUserId={conference.myUserId()}
                     onClick={
-                      participant._role === USER_ROLE.CO_HOST &&
-                      handleContextCoHostMenu
+                      (e)=>handleContextCoHostMenu(e,id)
                     }
                   />
                 ) } 
                 { space.type.speaker &&
-                  participant._id ===
-                    space.speakers.filter(
-                      (item) => item === participant._id
+                  id === space.speakers.filter(
+                      (item) => item === id
                     )[0] && (
                   <AvatarBox
                     role={USER_ROLE.SPEAKER}
@@ -267,18 +321,16 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
                     participantTracks={tracks[participantIds[index]]}
                     localUserId={conference.myUserId()}
                     onClick={
-                      participant._role === USER_ROLE.SPEAKER &&
-                      handleContextSpeakerMenu
+                      (e)=>handleContextSpeakerMenu(e, id)
                     }
                   />
                 ) } 
                 {space.type.listener &&
-                  participant._id ===
-                    space.listeners.filter(
-                      (item) => item === participant._id
+                  id === space.listeners.filter(
+                      (item) => item === id
                     )[0] && (
                   <AvatarBox
-                    role={USER_ROLE.HOST}
+                    role={USER_ROLE.LISTENER}
                     key={index}
                     isActiveSpeaker={
                       dominantSpeakerId === participantIds[index]
@@ -287,49 +339,43 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
                     participantTracks={tracks[participantIds[index]]}
                     localUserId={conference.myUserId()}
                     onClick={
-                      participant._role === USER_ROLE.LISTENER &&
-                      handleContextListenerMenu
+                      (e)=>handleContextListenerMenu(e,id)
                     }
                   />
                 )}
+                {(userRole.toUpperCase() === USER_ROLE.HOST) && 
                 <ContextMenu
                   contextMenu={contextHostMenu}
                   handleContextMenu={handleContextHostMenu}
                   handleClose={handleHostMenuClose}
-                  list={hostMenu}
-                />
+                  list={hostMenu?.host}
+                />}
+                {((userRole.toUpperCase() === USER_ROLE.HOST) || (userRole.toUpperCase() === USER_ROLE.CO_HOST)) && 
                 <ContextMenu
                   contextMenu={contextCoHostMenu}
                   handleContextMenu={handleContextCoHostMenu}
                   handleClose={handleCoHostMenuClose}
-                  list={coHostMenu}
-                />
+                  list={userRole.toUpperCase() === USER_ROLE.HOST ? coHostMenu?.host : (userRole.toUpperCase() === USER_ROLE.CO_HOST) && coHostMenu?.cohost}
+                />}
+                {((userRole.toUpperCase() === USER_ROLE.HOST) || (userRole.toUpperCase() === USER_ROLE.CO_HOST) || (userRole.toUpperCase() === USER_ROLE.SPEAKER)) && 
                 <ContextMenu
                   contextMenu={contextSpeakerMenu}
                   handleContextMenu={handleContextSpeakerMenu}
                   handleClose={handleSpeakerMenuClose}
-                  list={speakerMenu}
+                  list={(userRole.toUpperCase() === USER_ROLE.HOST ? speakerMenu?.host : userRole.toUpperCase() === USER_ROLE.CO_HOST ? speakerMenu?.cohost : (userRole.toUpperCase() === USER_ROLE.SPEAKER) && speakerMenu?.speaker)}
                 />
+                  }
+                  {((userRole.toUpperCase() === USER_ROLE.HOST) || (userRole.toUpperCase() === USER_ROLE.CO_HOST) || (userRole.toUpperCase() === USER_ROLE.LISTENER)) && 
                 <ContextMenu
-                  contextMenu={contextSpeakerMenu}
+                  contextMenu={contextListenerMenu}
                   handleContextMenu={handleContextListenerMenu}
                   handleClose={handleListenerMenuClose}
-                  list={listenerMenu}
+                  list={userRole.toUpperCase() === USER_ROLE.HOST ? listenerMenu.host : (userRole.toUpperCase() === USER_ROLE.CO_HOST) ? listenerMenu.cohost : (userRole.toUpperCase() === USER_ROLE.LISTENER) && listenerMenu?.listener}
                 />
+                  }
               </>
             ) : null;
           })}
-          {/* <AvatartBox name="Sachin" authority="Co-host" />
-                <AvatartBox name="Rahul" authority="Speaker" />
-                <AvatartBox name="Hari" authority="Listener" />
-                <AvatartBox name="George" authority="Speaker" />
-                <AvatartBox name="Sanny" authority="Listener" />
-                <AvatartBox name="Chandan" authority="Listener" />
-                <AvatartBox name="James" authority="Speaker" />
-                <AvatartBox name="Herbert" authority="Listener" />
-                <AvatartBox name="Jhingle" authority="Speaker" />
-                <AvatartBox name="Anuj" authority="Listener" />
-                <AvatartBox name="Hanskia" authority="Listener" /> */}
         </AvatarContainerBox>
         {/* <CaptionBox /> */}
       </Stack>

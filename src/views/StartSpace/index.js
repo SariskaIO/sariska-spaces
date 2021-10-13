@@ -13,7 +13,7 @@ import { clearAllTokens, getRandomColor, getToken, getUserName, getUserRole } fr
 import { addConnection } from "../../store/actions/connection";
 import { setDisconnected } from "../../store/actions/layout";
 import { setProfile } from "../../store/actions/profile";
-import { makeSpeakers, setHost, setSpace } from "../../store/actions/space";
+import { makeListeners, makeSpeakers, setCoHosts, setHost, setSpace } from "../../store/actions/space";
 import { addConference } from "../../store/actions/conference";
 import { addThumbnailColor } from "../../store/actions/color";
 import { localTrackMutedChanged } from "../../store/actions/track";
@@ -23,7 +23,7 @@ import CloseOnlyDialogueHeader from "../../components/shared/CloseOnlyDialogueHe
 import Switches from "../../components/shared/Switch";
 import SelectMenu from "../../components/shared/SelectMenu";
 import { localParticipantData } from "../../data";
-import { USER_ROLE } from "../../constants";
+import { USER_ROLE, USER_SCREEN } from "../../constants";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   paddingTop: theme.spacing(0),
@@ -76,6 +76,7 @@ const StartSpace = () => {
   const queryParams = useParams();
   const urlSearchParams = new URLSearchParams(window.location.search);
   let spaceType = Object.fromEntries(urlSearchParams?.entries())?.private;
+  let userRole = Object.fromEntries(urlSearchParams?.entries())?.role;
 
   const handleNameChange = (event) => {
     setNameId(event.target.value);
@@ -98,14 +99,12 @@ const StartSpace = () => {
     }
 
     const connection = new SariskaMediaTransport.JitsiConnection(token);
-    console.log('tokenr', token, isModerator, accessDenied, connection, profile);
     
     connection.addEventListener(
       SariskaMediaTransport.events.connection.CONNECTION_ESTABLISHED,
       () => {
         dispatch(addConnection(connection));
         createConference(connection);
-        console.log('queryaprr',!queryParams.spaceId, queryParams.spaceId, !(queryParams.spaceId));
       }
     );
     connection.addEventListener(SariskaMediaTransport.events.connection.CONNECTION_FAILED, (error) => {
@@ -126,22 +125,32 @@ const StartSpace = () => {
   const createConference = async (connection) => {
     const conference = connection.initJitsiConference();
     conference.addTrack(audioTrack);
-      console.log('setlocal', conference.getLocalUser());
       if(!queryParams.spaceId){
-        console.log('setlocalq');
       conference.setLocalParticipantProperty("host", "true");
       dispatch(setHost({participantId: conference.getLocalUser().id, host: "true"}))
       }else {
-        console.log('setlocals');
-      conference.setLocalParticipantProperty("host", "true");
-      dispatch(makeSpeakers({participantId: conference.getLocalUser().id, speaker: "true"}))
+        if(userRole==="cohost"){
+          conference.setLocalParticipantProperty("cohost", "true");
+          dispatch(setCoHosts({participantId: conference.getLocalUser().id, cohost: "true"}))
+          conference.grantOwner(conference.getLocalUser().id);
+        }else if(userRole === "speaker"){
+          conference.setLocalParticipantProperty("speaker", "true");
+          dispatch(makeSpeakers({participantId: conference.getLocalUser().id, speaker: "true"}))
+        }else if(userRole === "listener"){
+          conference.setLocalParticipantProperty("listener", "true");
+          dispatch(makeListeners({participantId: conference.getLocalUser().id, listener: "true"}))
+        }
       }
     conference.addEventListener(
       SariskaMediaTransport.events.conference.CONFERENCE_JOINED,
       () => {
         setLoading(false);
         dispatch(addConference(conference));
-        history.push(`/${spaceTitle}?private=${checked}`);
+        if(queryParams.spaceId) {
+        history.push(`/${spaceTitle}?private=${checked}&role=${userRole}`);
+        }else{
+          history.push(`/${spaceTitle}?private=${checked}&role=${USER_SCREEN.HOST}`);
+        }
       }
     );
     conference.addEventListener(
@@ -201,7 +210,7 @@ const handleClose = () => {
   clearAllTokens()
   history.push('/');
 }
-console.log('query', queryParams, profile, nameId, localParticipantData, getUserName(localParticipantData, nameId))
+
   return (
     <ContentBox>
       <CloseOnlyDialogueHeader handleLeave={handleClose} closeTitle="Don't Create a Space"/>

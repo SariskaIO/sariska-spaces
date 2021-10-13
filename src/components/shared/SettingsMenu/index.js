@@ -17,25 +17,62 @@ const HiddenBox = styled(Box)(()=>({
   display: 'none'
 }))
 
-export default function SettingsMenu({anchorEl, open, handleClose, copySuccess, setCopySuccess}) {
-  const textToCopy = window.location.href;
+export default function SettingsMenu({anchorEl, open, setAnchorEl}) {
+  const [copySuccessCoHost, setCopySuccessCoHost] = React.useState('Copy to Invite Co-host');
+  const [copySuccessSpeaker, setCopySuccessSpeaker] = React.useState('Copy to Invite Speaker');
+  const [copySuccessListener, setCopySuccessListener] = React.useState('Copy to Listener');
+  
+  let urlSearchParams = new URLSearchParams(window.location.search);
+  let privateSearchParams = Object.fromEntries(urlSearchParams?.entries())?.private;
+  let role = Object.fromEntries(urlSearchParams?.entries())?.role;
+
+  const textToCopyCoHost = window.location.origin+window.location.pathname+`?private=${privateSearchParams}&role=cohost`;
+  const textToCopySpeaker = window.location.origin+window.location.pathname+`?private=${privateSearchParams}&role=speaker`;
+  const textToCopyListener = window.location.origin+window.location.pathname+`?private=${privateSearchParams}&role=listener`;
+
   const history = useHistory();
+
   const handleTweet = () => {
+    if(role === "host" || role==="cohost"){
     window.open('https://twitter.com/compose/tweet', '_blank');
-    handleClose();
+    }
+    setAnchorEl(null)
   }
   const handleDM = () => {
+    if(role === "host" || role==="cohost"){
     window.open('https://twitter.com/messages', '_blank');
-    handleClose();
+    }
+    setAnchorEl(null)
   }
-  function copyToClipboard() {
-    navigator.clipboard.writeText(textToCopy);
-    setCopySuccess('Copy Again');
+  function copyCoHostToClipboard() {
+    if(role === "host"){
+    navigator.clipboard.writeText(textToCopyCoHost);
+    setCopySuccessCoHost('Copy CoHost Again');
+    }
+  }
+  function copySpeakerToClipboard() {
+    if(role === "host" || role==="cohost"){
+    navigator.clipboard.writeText(textToCopySpeaker);
+    setCopySuccessSpeaker('Copy Speaker Again');
+    }
+  }
+  function copyListenerToClipboard() {
+    if(role === "host" || role==="cohost"){
+    navigator.clipboard.writeText(textToCopyListener);
+    setCopySuccessListener('Copy Listener Again');
+    }
+  }
+
+  const handleClose = () => {
+    setAnchorEl(null);
+    setCopySuccessCoHost("Copy to Invite Co-host");
+    setCopySuccessSpeaker("Copy to Invite Speaker");
+    setCopySuccessListener("Copy to Listener");
   }
   const inviteMenu =() => {
     history.push('/invite');
   }
-  console.log('copya', copySuccess)
+
   return (
     <div>
       <Menu
@@ -53,26 +90,44 @@ export default function SettingsMenu({anchorEl, open, handleClose, copySuccess, 
           </ListItemIcon>
           <StyledListItemText>Invite</StyledListItemText>
         </MenuItem> */}
-        <MenuItem onClick={handleTweet} >
+        <MenuItem onClick={handleTweet} disabled={(role === "speaker" || role === "listener") && "true"}>
           <ListItemIcon>
             <AssignmentIcon fontSize="small" />
           </ListItemIcon>
           <StyledListItemText>Koo</StyledListItemText>
         </MenuItem>
 
-        <MenuItem onClick={handleDM}>
+        <MenuItem onClick={handleDM} disabled={(role === "speaker" || role === "listener") && "true"}>
           <ListItemIcon>
             <SmsIcon fontSize="small" />
           </ListItemIcon>
           <StyledListItemText>Direct Message</StyledListItemText>
         </MenuItem>
-        <MenuItem onClick={copyToClipboard}>
+        <MenuItem onClick={copyCoHostToClipboard} disabled={(role === "cohost" || role === "speaker" || role === "listener")}>
           <ListItemIcon>
             <ContentCopyIcon fontSize="small" />
           </ListItemIcon>
-          <StyledListItemText>{copySuccess}</StyledListItemText>
+          <StyledListItemText>{copySuccessCoHost}</StyledListItemText>
           <HiddenBox>
-            <CopyLink copySuccess={copySuccess} setCopySuccess={setCopySuccess} textToCopy={textToCopy} onClick={copyToClipboard}/>
+            <CopyLink copySuccess={copySuccessCoHost} setCopySuccess={setCopySuccessCoHost} textToCopy={textToCopyCoHost} onClick={copyCoHostToClipboard}/>
+          </HiddenBox>
+        </MenuItem>
+        <MenuItem onClick={copySpeakerToClipboard} disabled={(role === "speaker" || role === "listener")}>
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
+          <StyledListItemText>{copySuccessSpeaker}</StyledListItemText>
+          <HiddenBox>
+            <CopyLink copySuccess={copySuccessSpeaker} setCopySuccess={setCopySuccessSpeaker} textToCopy={textToCopySpeaker} onClick={copySpeakerToClipboard}/>
+          </HiddenBox>
+        </MenuItem>
+        <MenuItem onClick={copyListenerToClipboard}>
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
+          <StyledListItemText>{copySuccessListener}</StyledListItemText>
+          <HiddenBox>
+            <CopyLink copySuccess={copySuccessListener} setCopySuccess={setCopySuccessListener} textToCopy={textToCopyListener} onClick={copyListenerToClipboard}/>
           </HiddenBox>
         </MenuItem>
       </Menu>

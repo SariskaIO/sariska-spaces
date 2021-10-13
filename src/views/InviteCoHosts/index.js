@@ -86,7 +86,6 @@ const InviteCoHosts = () => {
         <Stack>
           <List sx={{ width: "100%" }}>
             {[...conference.getParticipantsWithoutHidden()].map((participant, index)=> {
-              console.log('partyl', participant, participant._id, conference.myUserId(), profile)
               let participantDetails = participant?._identity?.user;
               let avatarColor = avatarColors[participantDetails?.id];
               return tracks[participantIds[index]] ? (

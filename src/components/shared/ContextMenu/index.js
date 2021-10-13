@@ -4,7 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 
 export default function ContextMenu({contextMenu, handleContextMenu, handleClose, list}) {
-
+  console.log('litry', list);
   return (
     <div onContextMenu={handleContextMenu} style={{ cursor: 'context-menu' }}>
       <Menu
@@ -17,7 +17,7 @@ export default function ContextMenu({contextMenu, handleContextMenu, handleClose
             : undefined
         }
       >
-        {list.map((item, index)=>(
+        {list?.length && list?.map((item, index)=>(
           <MenuItem onClick={()=>handleClose(item.title)} key={index}>{item.title}</MenuItem>
         ))}
       </Menu>

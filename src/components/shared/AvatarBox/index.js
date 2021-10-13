@@ -36,7 +36,8 @@ const AvatarCircle = styled(Avatar)(({theme})=>({
 const Name = styled(Typography)(({theme})=>({
     fontWeight: 600,
     fontSize: '0.7rem',
-    marginTop: '12px'
+    marginTop: '12px',
+    textTransform: 'capitalize'
 }))
 const Role = styled(Typography)(({theme})=>({
     textTransform: 'capitalize'
@@ -71,7 +72,6 @@ const AvatartBox = ({
     const { pinnedPartcipantId, raisedHandParticipantIds } = useSelector(state => state.layout);
     const dispatch = useDispatch();
     let avatarColor = avatarColors[participantDetails?.id];
-    console.log('avatrt', raisedHandParticipantIds, participantDetails);
 
     return (
         <AvatarBoxContainer onClick={onClick}>

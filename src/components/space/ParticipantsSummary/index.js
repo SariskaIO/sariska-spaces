@@ -81,7 +81,6 @@ const ParticipantsSummary = ({ handleDialogue, handleLeave, handleMinimize }) =>
 // useEffect(()=>{
 //   setParticipants([...conference.getParticipantsWithoutHidden()]);
 // },[conference.getParticipantsWithoutHidden()])
- console.log('getpart', participants, [...conference.getParticipantsWithoutHidden()], [...conference.getParticipantsWithoutHidden()].length)
   return (
     <>
       <StyledBox onClick={handleMinimize}>
@@ -103,7 +102,6 @@ const ParticipantsSummary = ({ handleDialogue, handleLeave, handleMinimize }) =>
                   <img height="40" src={img} alt="voice" />
                     {
                       [...conference.getParticipantsWithoutHidden(), {_identity: { user: localUser }, _id: localUser.id, _role: 'moderator'}].map((participant, index)=>{
-                        console.log('suttrm', participant._id === space.host, participant, space.host)
                         return (participant._id === space.host) && (
                         <Name>
                          { participant?._identity?.user?.name }
