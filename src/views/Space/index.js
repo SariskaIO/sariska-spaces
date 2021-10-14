@@ -150,21 +150,23 @@ const Space = () => {
             }
             if(conference.user.id){
                 setRoleChanged(true);
-                setMessage(`My Role changed, new role is :  ${role}`)
+                setMessage(`My Role changed, new role is :  ${role}`);
+                dispatch(showNotification({message: `My Role changed, new role is :  ${role}`, autoHide: true, severity: "info"}));
             }else {
                 setRoleChanged(true);
-                setMessage(`Participant ${id} Role changed, new role is : ${role}`)
+                setMessage(`Participant ${id} Role changed, new role is : ${role}`);
+                dispatch(showNotification({message: `Participant ${id} Role changed, new role is : ${role}`, autoHide: true, severity: "info"}));
             }
 
         });
 
         conference.addEventListener(SariskaMediaTransport.events.conference.KICKED, (id)=> { // if a user kicked by moderator 
             // kicked participant id
-            alert(`${id} has been removed`);
+            dispatch(showNotification({message: `Participant ${id} has been removed`, autoHide: true, severity: "info"}));
           });
 
         conference.addEventListener(SariskaMediaTransport.events.conference.PARTICIPANT_KICKED, (actorParticipant, kickedParticipant, reason) => {
-            alert(`${actorParticipant} has removed ${kickedParticipant} for ${reason}`);
+            dispatch(showNotification({message: `${actorParticipant} has removed ${kickedParticipant} for ${reason}`, autoHide: true, severity: "info"}));
         })
 
         conference.addEventListener(SariskaMediaTransport.events.conference.LOBBY_USER_JOINED, (id, displayName) => {
@@ -220,15 +222,7 @@ const Space = () => {
             <ParticipantsSummary handleMinimize={handleMinimize}/>
             <SnackbarBox notification={notification}/>
             <ReconnectDialog open={layout.disconnected}/>
-            <Snackbar
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center',
-                }}
-                autoHideDuration={2000}
-                open={roleChanged}
-                message="Conference access denied by moderator"
-            />
+        
         </div>
     )
 }

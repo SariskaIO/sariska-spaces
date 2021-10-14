@@ -41,9 +41,9 @@ const SpaceTerms = () => {
   
 
   const createNewLocalTracks = async () => {
-    const newLocalTracks = await SariskaMediaTransport?.createLocalTracks(
-      options
-    );
+      const newLocalTracks = await SariskaMediaTransport?.createLocalTracks(
+        options
+      );
     setLocalTracks(newLocalTracks);
     newLocalTracks?.forEach((track) => dispatch(addLocalTrack(track)));
   };

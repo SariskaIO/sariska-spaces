@@ -123,7 +123,7 @@ const StartSpace = () => {
     dispatch(setSpace({ spaceTitle }));
   };
   const createConference = async (connection) => {
-    const conference = connection.initJitsiConference();
+    const conference = userRole==="listener" ? connection.initJitsiConference({startAudioMuted: true}) : connection.initJitsiConference();
     conference.addTrack(audioTrack);
       if(!queryParams.spaceId){
       conference.setLocalParticipantProperty("host", "true");
@@ -267,7 +267,7 @@ const handleClose = () => {
           />
           <Switches disabled={queryParams.spaceId ? true : false} setChecked ={setChecked} checked={checked}/>
         </Box>
-        <AudioBox>
+        {userRole !== "listener" && (<AudioBox>
           {audioTrack?.isMuted() ? (
             <Tooltip title="Unmute Audio" arrow>
               <DisableMicOffOutlinedIcon onClick={unmuteAudioLocalTrack} />
@@ -277,7 +277,7 @@ const handleClose = () => {
               <MicNoneOutlinedIcon onClick={muteAudioLocalTrack} />
             </Tooltip>
           )}
-        </AudioBox>
+        </AudioBox>)}
         <Box sx={{ pt: 1 }}>
           <RootButton
             variant="extended"

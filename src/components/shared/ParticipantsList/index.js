@@ -170,16 +170,6 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
       if(text === "Make Speaker") {
         console.log('Make')
       }
-      if(text === "Mute") {
-        if((userRole.toUpperCase() === USER_ROLE.HOST) || (userRole.toUpperCase() === USER_ROLE.CO_HOST)){
-          conference.muteParticipant(participantId, 'audio');
-          dispatch(remoteTrackMutedChanged());
-        }
-        if(userRole.toUpperCase() === USER_ROLE.LISTENER){
-          audioTrack.mute();
-          dispatch(localTrackMutedChanged());
-        }
-      }
       if(text === "Remove Listener") {
         conference.kickParticipant(participantId);
       }
@@ -202,7 +192,6 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
 
   const hostMenu = {
     host: [
-    {title: 'Turn into Co-host'},
     {title: 'Mute'}
     ]
   };
@@ -246,7 +235,7 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
     {title: 'Remove Listener'}
   ],
   listener: [
-    {title: 'Mute'},
+    {title: 'Request To Speak'},
   ]
 }
 
