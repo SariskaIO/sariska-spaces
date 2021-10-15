@@ -20,10 +20,10 @@
     "redux-persist": "^6.0.0",
     "redux-promise": "^0.6.0",
     "redux-thunk": "^2.3.0",
-    "sariska-media-transport": "git+https://github.com/SariskaIO/sariska-media-transport.git",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
+    "deploy": "aws s3 cp build s3://test.sariska.io --recursive --acl public-read && aws cloudfront create-invalidation --distribution-id E2GEKJL3QWLD6E --paths / /bundle.js /index.html",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
