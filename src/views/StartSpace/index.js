@@ -1,19 +1,39 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { Box, CircularProgress, Snackbar, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Snackbar,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useDispatch, useSelector } from "react-redux";
 import SariskaMediaTransport from "sariska-media-transport/build/SariskaMediaTransport";
 import MicNoneOutlinedIcon from "@mui/icons-material/MicNoneOutlined";
 import MicOffOutlinedIcon from "@mui/icons-material/MicOffOutlined";
-import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
-import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined';
+import ToggleOffOutlinedIcon from "@mui/icons-material/ToggleOffOutlined";
+import ToggleOnOutlinedIcon from "@mui/icons-material/ToggleOnOutlined";
 import { color } from "../../assets/colors";
-import { clearAllTokens, getRandomColor, getToken, getUserName, getUserRole } from "../../utils";
+import {
+  clearAllTokens,
+  getRandomColor,
+  getToken,
+  getUserName,
+  getUserRole,
+} from "../../utils";
 import { addConnection } from "../../store/actions/connection";
 import { setDisconnected } from "../../store/actions/layout";
 import { setProfile } from "../../store/actions/profile";
-import { makeListeners, makeSpeakers, setCoHosts, setHost, setSpace } from "../../store/actions/space";
+import {
+  makeListeners,
+  makeSpeakers,
+  setCoHosts,
+  setHost,
+  setSpace,
+} from "../../store/actions/space";
 import { addConference } from "../../store/actions/conference";
 import { addThumbnailColor } from "../../store/actions/color";
 import { localTrackMutedChanged } from "../../store/actions/track";
@@ -27,7 +47,7 @@ import { USER_ROLE, USER_SCREEN } from "../../constants";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   paddingTop: theme.spacing(0),
-  marginTop: '-30px'
+  marginTop: "-30px",
 }));
 const YourSpace = styled(Typography)(({ theme }) => ({
   fontWeight: 600,
@@ -80,7 +100,13 @@ const StartSpace = () => {
 
   const handleNameChange = (event) => {
     setNameId(event.target.value);
-    dispatch(setProfile( {name: getUserName(localParticipantData, event.target.value), id: event.target.value, role: getUserRole(localParticipantData, event.target.value)}));
+    dispatch(
+      setProfile({
+        name: getUserName(localParticipantData, event.target.value),
+        id: event.target.value,
+        role: getUserRole(localParticipantData, event.target.value),
+      })
+    );
   };
   const handleSpaceChange = (event) => {
     setSpaceTitle(event.target.value);
@@ -91,15 +117,24 @@ const StartSpace = () => {
       return;
     }
     setLoading(true);
-    let token = localStorage.getItem(`sariska_${spaceTitle}${getUserName(localParticipantData, nameId)}`);
+    let token = localStorage.getItem(
+      `sariska_${spaceTitle}${getUserName(localParticipantData, nameId)}`
+    );
     const isModerator = !queryParams.spaceId;
-    token = token ? token : await getToken(spaceTitle, profile, getUserName(localParticipantData, nameId), isModerator);
+    token = token
+      ? token
+      : await getToken(
+          spaceTitle,
+          profile,
+          getUserName(localParticipantData, nameId),
+          isModerator
+        );
     if (!token) {
       return;
     }
 
     const connection = new SariskaMediaTransport.JitsiConnection(token);
-    
+
     connection.addEventListener(
       SariskaMediaTransport.events.connection.CONNECTION_ESTABLISHED,
       () => {
@@ -107,11 +142,17 @@ const StartSpace = () => {
         createConference(connection);
       }
     );
-    connection.addEventListener(SariskaMediaTransport.events.connection.CONNECTION_FAILED, (error) => {
-      if (error === SariskaMediaTransport.errors.connection.CONNECTION_DROPPED_ERROR) {
+    connection.addEventListener(
+      SariskaMediaTransport.events.connection.CONNECTION_FAILED,
+      (error) => {
+        if (
+          error ===
+          SariskaMediaTransport.errors.connection.CONNECTION_DROPPED_ERROR
+        ) {
           dispatch(setDisconnected(true));
+        }
       }
-  });
+    );
     connection.addEventListener(
       SariskaMediaTransport.events.connection.PASSWORD_REQUIRED,
       () => {
@@ -123,33 +164,56 @@ const StartSpace = () => {
     dispatch(setSpace({ spaceTitle }));
   };
   const createConference = async (connection) => {
-    const conference = userRole==="listener" ? connection.initJitsiConference({startAudioMuted: true}) : connection.initJitsiConference();
+    const conference =
+      userRole === "listener"
+        ? connection.initJitsiConference({ startAudioMuted: true })
+        : connection.initJitsiConference();
     conference.addTrack(audioTrack);
-      if(!queryParams.spaceId){
+    if (!queryParams.spaceId) {
       conference.setLocalParticipantProperty("host", "true");
-      dispatch(setHost({participantId: conference.getLocalUser().id, host: "true"}))
-      }else {
-        if(userRole==="cohost"){
-          conference.setLocalParticipantProperty("cohost", "true");
-          dispatch(setCoHosts({participantId: conference.getLocalUser().id, cohost: "true"}))
-          conference.grantOwner(conference.getLocalUser().id);
-        }else if(userRole === "speaker"){
-          conference.setLocalParticipantProperty("speaker", "true");
-          dispatch(makeSpeakers({participantId: conference.getLocalUser().id, speaker: "true"}))
-        }else if(userRole === "listener"){
-          conference.setLocalParticipantProperty("listener", "true");
-          dispatch(makeListeners({participantId: conference.getLocalUser().id, listener: "true"}))
-        }
+
+      dispatch(
+        setHost({ participantId: conference.getLocalUser().id, host: "true" })
+      );
+    } else {
+      if (userRole === "cohost") {
+        conference.setLocalParticipantProperty("cohost", "true");
+        dispatch(
+          setCoHosts({
+            participantId: conference.getLocalUser().id,
+            cohost: "true",
+          })
+        );
+        conference.grantOwner(conference.getLocalUser().id);
+      } else if (userRole === "speaker") {
+        conference.setLocalParticipantProperty("speaker", "true");
+        dispatch(
+          makeSpeakers({
+            participantId: conference.getLocalUser().id,
+            speaker: "true",
+          })
+        );
+      } else if (userRole === "listener") {
+        conference.setLocalParticipantProperty("listener", "true");
+        dispatch(
+          makeListeners({
+            participantId: conference.getLocalUser().id,
+            listener: "true",
+          })
+        );
       }
+    }
     conference.addEventListener(
       SariskaMediaTransport.events.conference.CONFERENCE_JOINED,
       () => {
         setLoading(false);
         dispatch(addConference(conference));
-        if(queryParams.spaceId) {
-        history.push(`/${spaceTitle}?private=${checked}&role=${userRole}`);
-        }else{
-          history.push(`/${spaceTitle}?private=${checked}&role=${USER_SCREEN.HOST}`);
+        if (queryParams.spaceId) {
+          history.push(`/${spaceTitle}?private=${checked}&role=${userRole}`);
+        } else {
+          history.push(
+            `/${spaceTitle}?private=${checked}&role=${USER_SCREEN.HOST}`
+          );
         }
       }
     );
@@ -159,16 +223,22 @@ const StartSpace = () => {
         setLoading(false);
       }
     );
-    conference.addEventListener(SariskaMediaTransport.events.conference.USER_JOINED, (id) => {
-      dispatch(addThumbnailColor({participantId: id, color: getRandomColor()}));
-  });
-  conference.addEventListener(
+    conference.addEventListener(
+      SariskaMediaTransport.events.conference.USER_JOINED,
+      (id) => {
+        console.log('getpa', conference.getParticipantsWithoutHidden());
+        dispatch(
+          addThumbnailColor({ participantId: id, color: getRandomColor() })
+        );
+      }
+    );
+    conference.addEventListener(
       SariskaMediaTransport.events.conference.CONFERENCE_FAILED,
       async (error) => {
         if (
           error === SariskaMediaTransport.errors.conference.MEMBERS_ONLY_ERROR
         ) {
-          (checked === "true") && setButtonText("Asking to join");
+          checked === "true" && setButtonText("Asking to join");
           conference.joinLobby(getUserName(localParticipantData, nameId));
         }
 
@@ -195,7 +265,7 @@ const StartSpace = () => {
     await audioTrack.mute();
     dispatch(localTrackMutedChanged());
   };
-  
+
   useEffect(() => {
     if (queryParams.spaceId) {
       setButtonText("Join Space");
@@ -205,43 +275,50 @@ const StartSpace = () => {
     setNameId(profile.id);
   }, [profile]);
 
-
-const handleClose = () => {
-  clearAllTokens()
-  history.push('/');
-}
+  const handleClose = () => {
+    clearAllTokens();
+    history.push("/");
+  };
 
   return (
     <ContentBox>
-      <CloseOnlyDialogueHeader handleLeave={handleClose} closeTitle="Don't Create a Space"/>
-    <StyledBox>
-      <Stack>
-        <YourSpace variant="h5">Your Space</YourSpace>
-        <Typography variant="subtitle2" sx={{ textAlign: "center", py: 2 }}>
-          As Spaces are Public, anyone can join your space
-        </Typography>
-        <Box
-          component="form"
-          sx={{
-            "& > :not(style)": { m: 1, width: "30ch" },
-            margin: "auto",
-            mt: 2,
-            mb: 2.5,
-            "& label": {
-              fontWeight: 600,
-              "&.Mui-focused": {
-                color: color.gray,
+      <CloseOnlyDialogueHeader
+        handleLeave={handleClose}
+        closeTitle="Don't Create a Space"
+      />
+      <StyledBox>
+        <Stack>
+          <YourSpace variant="h5">Your Space</YourSpace>
+          <Typography variant="subtitle2" sx={{ textAlign: "center", py: 2 }}>
+            As Spaces are Public, anyone can join your space
+          </Typography>
+          <Box
+            component="form"
+            sx={{
+              "& > :not(style)": { m: 1, width: "30ch" },
+              margin: "auto",
+              mt: 2,
+              mb: 2.5,
+              "& label": {
+                fontWeight: 600,
+                "&.Mui-focused": {
+                  color: color.gray,
+                },
               },
-            },
-            "&.MuiInputBase-root-MuiInput-root:after": {
-              borderBottom: `2px solid ${color.gray}`,
-            },
-          }}
-          noValidate
-          autoComplete="off"
-        >
-          <SelectMenu  nameId={nameId} setNameId={setNameId} handleChange={handleNameChange} list={localParticipantData}/>
-          {/* <StyledTextField
+              "&.MuiInputBase-root-MuiInput-root:after": {
+                borderBottom: `2px solid ${color.gray}`,
+              },
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <SelectMenu
+              nameId={nameId}
+              setNameId={setNameId}
+              handleChange={handleNameChange}
+              list={localParticipantData}
+            />
+            {/* <StyledTextField
             id="filled-name"
             label="Enter Your Name"
             type="text"
@@ -253,55 +330,68 @@ const handleClose = () => {
             onChange={handleNameChange}
             sx={{ color: "red !important" }}
           /> */}
-          <StyledTextField
-            id="filled-number"
-            label="Name Your Space"
-            type="text"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            variant="standard"
-            value={spaceTitle}
-            onChange={handleSpaceChange}
-            sx={{ color: "red !important" }}
-          />
-          <Switches disabled={queryParams.spaceId ? true : false} setChecked ={setChecked} checked={checked}/>
-        </Box>
-        {userRole !== "listener" && (<AudioBox>
-          {audioTrack?.isMuted() ? (
-            <Tooltip title="Unmute Audio" arrow>
-              <DisableMicOffOutlinedIcon onClick={unmuteAudioLocalTrack} />
-            </Tooltip>
-          ) : (
-            <Tooltip title="Mute Audio" arrow>
-              <MicNoneOutlinedIcon onClick={muteAudioLocalTrack} />
-            </Tooltip>
-          )}
-        </AudioBox>)}
-        <Box sx={{ pt: 1 }}>
-          <RootButton
-            variant="extended"
-            size="large"
-            buttonText={buttonText}
-            width="100%"
-            onClick={handleSubmit}
-            disabled={loading}
-          />
-        </Box>
-        {loading && (
-                        <CircularProgress size={24} sx={{color:color.yellow, marginTop: '-60px', marginLeft: '100px'}}/>
-                    )}
-        <Snackbar
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center',
-                }}
-                autoHideDuration={2000}
-                open={accessDenied}
-                message="Conference access denied by moderator"
+            <StyledTextField
+              id="filled-number"
+              label="Name Your Space"
+              type="text"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              variant="standard"
+              value={spaceTitle}
+              onChange={handleSpaceChange}
+              sx={{ color: "red !important" }}
             />
-      </Stack>
-    </StyledBox>
+            <Switches
+              disabled={queryParams.spaceId ? true : false}
+              setChecked={setChecked}
+              checked={checked}
+            />
+          </Box>
+          {userRole !== "listener" && (
+            <AudioBox>
+              {audioTrack?.isMuted() ? (
+                <Tooltip title="Unmute Audio" arrow>
+                  <DisableMicOffOutlinedIcon onClick={unmuteAudioLocalTrack} />
+                </Tooltip>
+              ) : (
+                <Tooltip title="Mute Audio" arrow>
+                  <MicNoneOutlinedIcon onClick={muteAudioLocalTrack} />
+                </Tooltip>
+              )}
+            </AudioBox>
+          )}
+          <Box sx={{ pt: 1 }}>
+            <RootButton
+              variant="extended"
+              size="large"
+              buttonText={buttonText}
+              width="100%"
+              onClick={handleSubmit}
+              disabled={loading}
+            />
+          </Box>
+          {loading && (
+            <CircularProgress
+              size={24}
+              sx={{
+                color: color.yellow,
+                marginTop: "-60px",
+                marginLeft: "100px",
+              }}
+            />
+          )}
+          <Snackbar
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "center",
+            }}
+            autoHideDuration={2000}
+            open={accessDenied}
+            message="Conference access denied by moderator"
+          />
+        </Stack>
+      </StyledBox>
     </ContentBox>
   );
 };

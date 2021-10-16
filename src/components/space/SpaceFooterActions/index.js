@@ -10,7 +10,7 @@ import VolumeOffOutlinedIcon from "@mui/icons-material/VolumeOffOutlined";
 import SettingsMenu from "../../shared/SettingsMenu";
 import { color } from "../../../assets/colors";
 import { useDispatch, useSelector } from "react-redux";
-import { localTrackMutedChanged } from "../../../store/actions/track";
+import { localTrackMutedChanged, remoteTrackMutedChanged } from "../../../store/actions/track";
 import { useHistory, useParams } from 'react-router-dom';
 
 const StyledFab = styled(Fab)(({ theme }) => ({
@@ -27,16 +27,25 @@ const SpaceFooterActions = () => {
     const [mute, setMute] = useState(false);
     const [muteAll, setMuteAll] = useState(false);
     const [audioTrack] = useSelector(state => state.localTrack);
+    const localTracks = useSelector(state => state.localTrack);
+    const remoteTracks = useSelector(state => state.remoteTrack);
     const [raiseHand, setRaiseHand] = useState(false);
     const conference = useSelector(state=>state.conference);
+    const localUser = conference.getLocalUser();
     const dispatch = useDispatch()
-    const queryParams = useParams()
-  // const [open, setOpen] = useState(false);
+    const queryParams = useParams();
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    let userRole = Object.fromEntries(urlSearchParams?.entries())?.role;
+    console.log('all tr', audioTrack, remoteTracks);
 
-  // const handleOpen = (e) => {
-  //     e.preventDefault();
-  //     setOpen(!open);
-  // }
+    //merge local and remote track
+  let tracks = {
+    ...remoteTracks,
+    [localUser.id]: localTracks,
+  };
+
+  const participantIds = Object.keys(tracks);
+  
   const startRaiseHand = () => {
     conference.setLocalParticipantProperty("handraise", "start");
     setRaiseHand(true);
@@ -50,6 +59,11 @@ const stopRaiseHand = () => {
   };
   const handleMuteAllClick = () => {
     setMuteAll(!muteAll);
+    participantIds.map((track) => (
+      conference.muteParticipant(track, 'audio')
+    ))
+    dispatch(localTrackMutedChanged());
+    dispatch(remoteTrackMutedChanged());
   }
 
   const muteAudio = async () => {
@@ -82,7 +96,7 @@ const handleManageSpace = () => {
       </Tooltip>
       <Tooltip title={audioTrack?.isMuted() ? "Unmute Audio" : "Mute Audio"} placement="top" arrow>
         <StyledFab sx={audioTrack?.isMuted() && {background: color.yellow, '&:hover': {background: color.yellow, opacity: '0.8'}}} onClick={audioTrack?.isMuted() ?
-                    unmuteAudio : muteAudio}>
+                    unmuteAudio : muteAudio} disabled={userRole === "listener"}>
         {audioTrack?.isMuted() ?
                     <MicOffOutlinedIcon /> : <MicNoneOutlinedIcon />}
         </StyledFab>
@@ -93,7 +107,7 @@ const handleManageSpace = () => {
         </StyledFab>
       </Tooltip>
       <Tooltip title="Mute All" placement="top" arrow>
-        <StyledFab sx={muteAll && {background: color.yellow, '&:hover': {background: color.yellow, opacity: '0.8'}}} onClick={handleMuteAllClick}>
+        <StyledFab sx={muteAll && {background: color.yellow, '&:hover': {background: color.yellow, opacity: '0.8'}}} onClick={handleMuteAllClick} disabled={userRole==="speaker" || userRole === "listener"}>
           <VolumeUpOutlinedIcon />
         </StyledFab>
       </Tooltip>

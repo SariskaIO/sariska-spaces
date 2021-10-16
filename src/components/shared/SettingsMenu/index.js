@@ -34,13 +34,13 @@ export default function SettingsMenu({anchorEl, open, setAnchorEl}) {
 
   const handleTweet = () => {
     if(role === "host" || role==="cohost"){
-    window.open('https://twitter.com/compose/tweet', '_blank');
+      window.open('https://www.kooapp.com/create', '_blank');
     }
     setAnchorEl(null)
   }
   const handleDM = () => {
     if(role === "host" || role==="cohost"){
-    window.open('https://twitter.com/messages', '_blank');
+    window.open('https://www.kooapp.com/create', '_blank');
     }
     setAnchorEl(null)
   }

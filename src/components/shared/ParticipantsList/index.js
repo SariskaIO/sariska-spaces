@@ -49,6 +49,8 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
   const dispatch = useDispatch();
   const [audioTrack] = localTracks;
 
+  const roles = space.type.host ? USER_ROLE.HOST : space.type.cohost ? USER_ROLE.CO_HOST : space.type.speaker ? USER_ROLE.SPEAKER : space.type.listener ? USER_ROLE.LISTENER : 'No Role'
+
   //merge local and remote track
   let tracks = {
     ...remoteTracks,
@@ -56,7 +58,8 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
   };
 
   const participantIds = Object.keys(tracks);
-  console.log("numpr", space.host, space, layout);
+  console.log("numpr", space.host, space, layout, participantIds);
+  
 
   const handleContextHostMenu = (event, id) => {
     setParticipantId(id);
@@ -256,6 +259,7 @@ console.log('cohotsm', userRole.toUpperCase(), USER_ROLE.HOST, coHostMenu?.host,
           ]?.map((participant, index) => {
             console.log(
               "party",
+              roles,
               participant._id === space.host,
               participant,
               participant._id,space,
