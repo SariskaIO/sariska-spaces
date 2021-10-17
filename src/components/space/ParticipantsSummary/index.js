@@ -1,13 +1,14 @@
 import { Fab, Stack, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
-import React, { useEffect, useState } from "react";
+import React, {useEffect} from "react";
 import { styled } from "@mui/material/styles";
 import img from "../../../assets/images/voice.gif";
 import { color } from "../../../assets/colors";
 import CloseIcon from "@mui/icons-material/Close";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {useHistory} from 'react-router-dom';
-import {clearAllTokens} from '../../../utils';
+import { USER_ROLE } from "../../../constants";
+import { clearAllReducers } from "../../../store/actions/conference";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   background: color.gray,
@@ -71,16 +72,19 @@ const ParticipantsSummary = ({ handleDialogue, handleLeave, handleMinimize }) =>
   const conference = useSelector(state => state.conference);
   const localUser = conference.getLocalUser();
   const history = useHistory();
-  const [participants, setParticipants] = useState([]);
-  const space = useSelector(state => state.space);
+  const participants = useSelector(state=>state.participant);
+  const hosts = participants.filter(item=>item._properties?.subRole === USER_ROLE.HOST);
+  const others = participants.filter(item=>item._properties?.subRole !== USER_ROLE.HOST);
+  const dispatch = useDispatch();
+
+
+  console.log("participants", participants);
   
   const leaveConference = () => {
     history.push("/leave");
-    clearAllTokens();
-};
-// useEffect(()=>{
-//   setParticipants([...conference.getParticipantsWithoutHidden()]);
-// },[conference.getParticipantsWithoutHidden()])
+    dispatch(clearAllReducers());
+  };
+
   return (
     <>
       <StyledBox onClick={handleMinimize}>
@@ -101,17 +105,16 @@ const ParticipantsSummary = ({ handleDialogue, handleLeave, handleMinimize }) =>
                 <Stack direction="row" alignItems="center">
                   <img height="40" src={img} alt="voice" />
                     {
-                      [...conference.getParticipantsWithoutHidden(), {_identity: { user: localUser }, _id: localUser.id, _role: 'moderator'}].map((participant, index)=>{
-                        return (participant._id === space.host) && (
-                        <Name>
-                         { participant?._identity?.user?.name }
-                         <StyledCaption variant="caption">( Host )</StyledCaption> 
-                  </Name>
-                        )
-                      })
+                      hosts.map((participant, index)=>
+                        { 
+                         <Name>
+                            { participant?._identity?.user?.name }
+                            <StyledCaption variant="caption">( Host )</StyledCaption> 
+                          </Name>
+                        })
                     }
                 </Stack>
-                {([...conference.getParticipantsWithoutHidden()].length)>0 ? (<Name>+ {[...conference.getParticipantsWithoutHidden()].length} others</Name>) : (<Name>No one else is here</Name>) }
+                { others.length > 0 ? <Name>+ {others.length} others</Name>: <Name>No one else is here</Name> }
               </Stack>
             </Stack>
             <Title>{profile.spaceTitle}</Title>

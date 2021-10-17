@@ -46,32 +46,29 @@ const StyledFab = styled(Fab)(({theme})=>({
     //color: 'rgba(80,79,75,1)'
 }))
 
-const JoinSpace = ({open, handleClick, handleLeave, createLocalTrack}) => {
+const JoinSpace = ({open, handleLeave, handleJoinSpace}) => {
     const spaceTitle = useSelector(state=>state.profile?.spaceTitle);
-    const handleJoinSpace = () => {
-        handleClick();
-        createLocalTrack();
-    }
+
     return (
         <JoinBox>
             <Box sx={{minWidth: '360px'}}>
                 <Stack direction="row" justifyContent="space-between">
                 <Stack direction="column">
                 <Stack direction="row">
-                <Heading >Live </Heading> 
-                <Dot> . </Dot>
-                <Name >Gurudeep</Name> 
+                    <Heading >Live </Heading> 
+                    <Dot> . </Dot>
+                    <Name >Gurudeep</Name> 
                 </Stack>
                 <Title >{spaceTitle}</Title> 
                 </Stack>
-                <Box>
-                <AvatarGroup max={4}>
-                  <Avatar alt="Remy Sharp" sx={{ bgcolor: deepOrange[500] }}>G</Avatar>
-                  <Avatar alt="Travis Howard" sx={{ bgcolor: deepPurple[500] }}>B</Avatar>
-                  <Avatar alt="Cindy Baker">A</Avatar>
-                  <Avatar alt="Agnes Walker" sx={{ bgcolor: deepOrange[500] }}>B</Avatar>
-                </AvatarGroup> 
-                </Box>
+                    <Box>
+                        <AvatarGroup max={4}>
+                            <Avatar alt="Remy Sharp" sx={{ bgcolor: deepOrange[500] }}>G</Avatar>
+                            <Avatar alt="Travis Howard" sx={{ bgcolor: deepPurple[500] }}>B</Avatar>
+                            <Avatar alt="Cindy Baker">A</Avatar>
+                            <Avatar alt="Agnes Walker" sx={{ bgcolor: deepOrange[500] }}>B</Avatar>
+                        </AvatarGroup> 
+                    </Box>
                 </Stack>
                 <StyledFab variant="extended" size="small" aria-label="add" onClick={open ? handleLeave : handleJoinSpace}>
                   {open ? 'End Space' : 'Join the Space'}

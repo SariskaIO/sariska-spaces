@@ -10,7 +10,7 @@ import VolumeOffOutlinedIcon from "@mui/icons-material/VolumeOffOutlined";
 import SettingsMenu from "../../shared/SettingsMenu";
 import { color } from "../../../assets/colors";
 import { useDispatch, useSelector } from "react-redux";
-import { localTrackMutedChanged } from "../../../store/actions/track";
+import { localTrackMutedChanged, remoteTrackMutedChanged } from "../../../store/actions/track";
 import { useHistory, useParams } from 'react-router-dom';
 
 const StyledFab = styled(Fab)(({ theme }) => ({
@@ -24,51 +24,50 @@ const StyledFab = styled(Fab)(({ theme }) => ({
   },
 }));
 const SpaceFooterActions = () => {
-    const [mute, setMute] = useState(false);
     const [muteAll, setMuteAll] = useState(false);
     const [audioTrack] = useSelector(state => state.localTrack);
+    const remoteTracks = useSelector(state => state.remoteTrack);
     const [raiseHand, setRaiseHand] = useState(false);
     const conference = useSelector(state=>state.conference);
     const dispatch = useDispatch()
     const queryParams = useParams()
-  // const [open, setOpen] = useState(false);
-
-  // const handleOpen = (e) => {
-  //     e.preventDefault();
-  //     setOpen(!open);
-  // }
+  
   const startRaiseHand = () => {
     conference.setLocalParticipantProperty("handraise", "start");
     setRaiseHand(true);
-};
-const stopRaiseHand = () => {
+  };
+  
+  const stopRaiseHand = () => {
     conference.setLocalParticipantProperty("handraise", "stop");
     setRaiseHand(false);
-};
-  const handleMuteClick = () => {
-    setMute(!mute)
   };
-  const handleMuteAllClick = () => {
-    setMuteAll(!muteAll);
+  
+  const handleMuteAllClick = async() => {
+    for (let [key, value] of Object.entries(remoteTracks)) {
+       await conference.muteParticipant(key, "audio") 
+    }
+    dispatch(remoteTrackMutedChanged());
+    setMuteAll(true);
   }
 
   const muteAudio = async () => {
-    await audioTrack.mute();
-    dispatch(localTrackMutedChanged());
-};
+      await audioTrack.mute();
+      dispatch(localTrackMutedChanged());
+  };
 
-const unmuteAudio = async () => {
-    await audioTrack.unmute();
-    dispatch(localTrackMutedChanged());
-};
+  const unmuteAudio = async () => {
+      await audioTrack.unmute();
+      dispatch(localTrackMutedChanged());
+  };
 
-const handleManageSpace = () => {
-  history.push(`/invite/${queryParams.spaceId}`);
-}
+  const handleManageSpace = () => {
+    history.push(`/invite/${queryParams.spaceId}`);
+  }
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const history = useHistory();
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };

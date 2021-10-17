@@ -2,9 +2,10 @@ import React from 'react';
 import { Avatar, Box, Stack, styled, Typography} from '@mui/material'
 import { color } from '../../../assets/colors';
 import img from '../../../assets/images/voice.gif';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Audio from '../Audio';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
+import { USER_ROLE } from '../../../constants';
 
 const AvatarBoxContainer = styled(Box)(({theme})=>({
     display: 'flex',
@@ -67,35 +68,35 @@ const AvatartBox = ({
     onClick
 }) => {
 
-    const audioTrack = participantTracks.find(track => track.isAudioTrack());
+    const audioTrack = participantTracks?.find(track => track.isAudioTrack());
     const avatarColors = useSelector(state => state.color);
-    const { pinnedPartcipantId, raisedHandParticipantIds } = useSelector(state => state.layout);
-    const dispatch = useDispatch();
-    let avatarColor = avatarColors[participantDetails?.id];
+    const {raisedHandParticipantIds} = useSelector(state => state.layout);
+    let avatarColor = avatarColors[participantDetails?._id];
+    console.log("avatarColors", avatarColors);
+    const coHostOrSpeaker = (role === USER_ROLE.SPEAKER || role === USER_ROLE.HOST);
 
     return (
         <AvatarBoxContainer onClick={onClick}>
             <Box>
                 {!audioTrack?.isLocal() && <Audio track={audioTrack}/>}
             </Box>
-                    <AvatarCircle
-                        src={participantDetails?.avatar ? participantDetails?.avatar: null }
-                        sx={{bgColor: avatarColor}}>{participantDetails?.name.slice(0, 1).toUpperCase()}
-                    </AvatarCircle>
-                    <HandRaiseBox sx={raisedHandParticipantIds[participantDetails?.id] ? {marginTop: '-37px'} : {marginTop: '-12px'}}>
-                    {raisedHandParticipantIds[participantDetails?.id] &&
-                        <HandRaise ><PanToolOutlinedIcon /></HandRaise>
-                    }
-                    </HandRaiseBox>
-                    <Name>{localUserId === participantDetails?.id ? "You" : participantDetails?.name}</Name>
-                    <Stack direction="row" alignItems="center">
-                        <ImgContainer style={(role ==="Speaker" || role ==="Host") ? {padding: '2px 12px 2px 4px' }: {padding:'2px 12px 2px 12px'}}>
-                        {(role ==="Speaker" || role ==="Host") && <img src={img} alt="host" height="15px" width= '100%'/>}
-                        <Role>{role}</Role>
-                        </ImgContainer>
-                    </Stack>
-                </AvatarBoxContainer>
-    )
+            <AvatarCircle
+                src={participantDetails?.avatar ? participantDetails?.avatar: null }
+                sx={{bgColor: avatarColor}}>{participantDetails?.name.slice(0, 1).toUpperCase()}
+            </AvatarCircle>
+            <HandRaiseBox sx={raisedHandParticipantIds[participantDetails?.id] ? {marginTop: '-37px'} : {marginTop: '-12px'}}>
+                {raisedHandParticipantIds[participantDetails?.id] &&
+                    <HandRaise ><PanToolOutlinedIcon /></HandRaise>
+                }
+            </HandRaiseBox>
+            <Name>{localUserId === participantDetails?.id ? "You" : participantDetails?.name}</Name>
+            <Stack direction="row" alignItems="center">
+                <ImgContainer style={ coHostOrSpeaker ? {padding: '2px 12px 2px 4px' }: {padding:'2px 12px 2px 12px'}}>
+                { coHostOrSpeaker && <img src={img} alt="host" height="15px" width= '100%'/>}
+                <Role>{role}</Role>
+                </ImgContainer>
+            </Stack>
+        </AvatarBoxContainer>)
 }
 
 export default AvatartBox

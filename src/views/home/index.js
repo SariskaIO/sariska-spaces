@@ -17,19 +17,22 @@ const Home = () => {
   const history = useHistory();
   const queryParams = useParams();
   const urlSearchParams = new URLSearchParams(window.location.search);
-  let spaceType = Object.fromEntries(urlSearchParams?.entries())?.private;
+  let spaceType = Object.fromEntries(urlSearchParams?.entries())?.spacetype;
   let userRole = Object.fromEntries(urlSearchParams?.entries())?.role;
   SariskaMediaTransport.initialize();
-  SariskaMediaTransport.setLogLevel(SariskaMediaTransport.logLevels.Error); //TRACE, DEBUG, INFO, LOG, WARN, ERROR
+  SariskaMediaTransport.setLogLevel(SariskaMediaTransport.logLevels.ERROR); //TRACE ,DEBUG, INFO, LOG, WARN, ERROR
 
   const handleSetTerms = () => {
-    if(queryParams.spaceId){
-      history.push(`/terms/${queryParams.spaceId}?private=${spaceType}&role=${userRole}`);
-    }else{
-      history.push('/terms');
+    
+    console.log("userRole", userRole, spaceType)
+    if (queryParams.spaceId && userRole !== undefined && spaceType  !== undefined) {
+      history.push(`/terms/${queryParams.spaceId}?spacetype=${spaceType}&role=${userRole}`);
+    } else if ( queryParams.spaceId ) {
+      history.push(`/terms/${queryParams.spaceId}`);
+    } else {
+      history.push("/terms");
     }
   }
-  
   
   return (
     <StyledStack direction="column">

@@ -1,9 +1,7 @@
 import * as React from "react";
 import Switch from "@mui/material/Switch";
 import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
 import { Typography } from "@mui/material";
 import {styled} from "@mui/material/styles";
 import { color } from "../../../assets/colors";

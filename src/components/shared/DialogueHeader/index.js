@@ -6,7 +6,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import CloseIcon from '@mui/icons-material/Close';
 import { color } from '../../../assets/colors';
 import {useHistory} from 'react-router-dom';
-import {clearAllTokens} from '../../../utils';
+import { clearAllReducers } from '../../../store/actions/conference';
+import { useDispatch } from 'react-redux';
 
 const StyledBox = styled(Box)(()=>({
     display: 'flex',
@@ -42,9 +43,11 @@ const StyledFab = styled(Fab)(()=>({
 
 const DialogueHeader = ({handleLeave, handleMinimize, closeTitle}) => {
     const history=useHistory();
+    const dispatch = useDispatch();
+    
     const leaveConference = () => {
         history.push("/leave");
-        clearAllTokens();
+        dispatch(clearAllReducers());
     };
     return (
         <StyledBox>
