@@ -101,8 +101,13 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
 
   const handleCoHostMenuClose = (selectedItem, participantId) => {
 
+    if (selectedItem === "Make Host") {
+      conference.sendCommand("userRoleChanged", { attributes: {participantId, role: USER_ROLE.HOST }});
+      conference.grantOwner(participantId);
+    }
+
     if (selectedItem === "Make Speaker") {
-      conference.setLocalParticipantProperty("subRole", USER_ROLE.SPEAKER);
+      conference.sendCommand("userRoleChanged", { attributes: {participantId, role: USER_ROLE.SPEAKER }});
       conference.revokeOwner(participantId);
     }
 
@@ -112,23 +117,22 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
 
     if (selectedItem === "Mute") {
       conference.muteParticipant(participantId, 'audio');
-      dispatch(remoteTrackMutedChanged());
     }
     setContextCoHostMenu(null);
   };
 
   const handleSpeakerMenuClose = (selectedItem, participantId) => {
     if (selectedItem === "Make Co-host") {
-      conference.sendCommand("userRoleChanged", { participantId, role: USER_ROLE.CO_HOST });
+      conference.sendCommand("userRoleChanged", { attributes: {participantId, role: USER_ROLE.CO_HOST }});
+      conference.grantOwner(participantId);
     }
 
     if (selectedItem === "Make Listener") {
-      conference.sendCommand("userRoleChanged", { participantId, role: USER_ROLE.LISTENER });
+      conference.sendCommand("userRoleChanged", { attributes:{participantId, role: USER_ROLE.LISTENER }});
     }
 
     if (selectedItem === "Mute") {
-      audioTrack.mute();
-      dispatch(localTrackMutedChanged());
+      conference.muteParticipant(participantId, "audio");
     }
 
     if (selectedItem === "Remove Speaker") {
@@ -139,11 +143,25 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
 
   const handleListenerMenuClose = (selectedItem, participantId) => {
     if (selectedItem === "Make Speaker") {
-      conference.sendCommand("userRoleChanged", { participantId, role: USER_ROLE.LISTENER });
+      conference.sendCommand("userRoleChanged", { attributes: { participantId, role: USER_ROLE.SPEAKER }});
+    }
+
+    if (selectedItem === "Remove Speaker") {
+      conference.kickParticipant(participantId);
+    }
+
+    if (selectedItem === "Mute") {
+      conference.muteParticipant(participantId, "audio");
     }
 
     if (selectedItem === "Remove Listener") {
       conference.kickParticipant(participantId);
+    }
+
+    if (selectedItem === "Request To Speak") {
+      console.log("Request To Speak");
+       const participant = conference.getParticipantsWithoutHidden().find(item=>item._properties.subRole === USER_ROLE.HOST);
+       conference.sendCommandOnce("requestToSpeak", { attributes: { participantId, hostId:  participant._id, participantName: participants.find(item=>item._id === participantId)?._identity?.user?.name}});
     }
     setContextListenerMenu(null);
   };
@@ -217,7 +235,7 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
   },[]);
 
   console.log("participants", participants);
-  
+
   return (
     <Box>
       <Stack>
@@ -297,7 +315,8 @@ const ParticipantsList = ({ dominantSpeakerId }) => {
           )}
 
           {participants.map(participant =>
-            participant._properties?.subRole === USER_ROLE.LISTENER && <>
+             participant._properties?.subRole === USER_ROLE.LISTENER && <>
+              {console.log(participant)}
               <AvatarBox
                 role={USER_ROLE.LISTENER}
                 key={participant._id}

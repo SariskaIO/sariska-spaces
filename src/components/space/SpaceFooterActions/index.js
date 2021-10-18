@@ -51,12 +51,12 @@ const SpaceFooterActions = () => {
   }
 
   const muteAudio = async () => {
-      await audioTrack.mute();
+      await audioTrack?.mute();
       dispatch(localTrackMutedChanged());
   };
 
   const unmuteAudio = async () => {
-      await audioTrack.unmute();
+      await audioTrack?.unmute();
       dispatch(localTrackMutedChanged());
   };
 

@@ -71,8 +71,12 @@ const AvatartBox = ({
     const audioTrack = participantTracks?.find(track => track.isAudioTrack());
     const avatarColors = useSelector(state => state.color);
     const {raisedHandParticipantIds} = useSelector(state => state.layout);
-    let avatarColor = avatarColors[participantDetails?._id];
-    console.log("avatarColors", avatarColors);
+
+
+    let avatarColor = avatarColors[participantDetails?.id];
+    console.log("avatarColors", avatarColor);
+
+
     const coHostOrSpeaker = (role === USER_ROLE.SPEAKER || role === USER_ROLE.HOST);
 
     return (
@@ -81,6 +85,7 @@ const AvatartBox = ({
                 {!audioTrack?.isLocal() && <Audio track={audioTrack}/>}
             </Box>
             <AvatarCircle
+                style={{backgroundColor: avatarColor}}
                 src={participantDetails?.avatar ? participantDetails?.avatar: null }
                 sx={{bgColor: avatarColor}}>{participantDetails?.name.slice(0, 1).toUpperCase()}
             </AvatarCircle>

@@ -23,5 +23,16 @@ export const participantPropertyChanged = () => {
 }
 
 
+export const updateParticipantRole = (payload) => {
+    return {
+        type: Constants.UPDATE_PARTICIPANT_ROLE,
+        payload
+    }
+}
+
+
+
+
+
 
 

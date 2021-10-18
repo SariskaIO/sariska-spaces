@@ -76,9 +76,6 @@ const ParticipantsSummary = ({ handleDialogue, handleLeave, handleMinimize }) =>
   const hosts = participants.filter(item=>item._properties?.subRole === USER_ROLE.HOST);
   const others = participants.filter(item=>item._properties?.subRole !== USER_ROLE.HOST);
   const dispatch = useDispatch();
-
-
-  console.log("participants", participants);
   
   const leaveConference = () => {
     history.push("/leave");

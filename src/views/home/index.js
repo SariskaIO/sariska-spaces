@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import RootButton from "../../components/shared/RootButton";
 import SariskaMediaTransport from "sariska-media-transport";
 import { useHistory, useParams } from "react-router-dom";
+import {useSelector} from "react-redux";
 
 const StyledStack = styled(Stack)(() => ({
   width: "100%",
@@ -17,8 +18,9 @@ const Home = () => {
   const history = useHistory();
   const queryParams = useParams();
   const urlSearchParams = new URLSearchParams(window.location.search);
+  const profile = useSelector(state=>state.profile);
   let spaceType = Object.fromEntries(urlSearchParams?.entries())?.spacetype;
-  let userRole = Object.fromEntries(urlSearchParams?.entries())?.role;
+  let userRole = Object.fromEntries(urlSearchParams?.entries())?.role || profile.subRole;
   SariskaMediaTransport.initialize();
   SariskaMediaTransport.setLogLevel(SariskaMediaTransport.logLevels.ERROR); //TRACE ,DEBUG, INFO, LOG, WARN, ERROR
 

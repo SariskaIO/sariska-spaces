@@ -6,17 +6,22 @@ import PermissionDialog from '../../components/shared/PermissionDialog';
 import SnackbarBox from '../../components/shared/Snackbar';
 import { setAudioLevel } from '../../store/actions/audioIndicator';
 import { unreadMessage } from '../../store/actions/chat';
-import { addThumbnailColor, removeThumbnailColor } from '../../store/actions/color';
-import { clearAllReducers, userRoleChanged } from '../../store/actions/conference';
+import { removeThumbnailColor } from '../../store/actions/color';
+import { participantPropertyChanged, updateParticipantRole } from '../../store/actions/participant';
+import { clearAllReducers } from '../../store/actions/conference';
 import { addMessage } from '../../store/actions/message';
 import { showNotification } from '../../store/actions/notification';
-import { addRemoteTrack, remoteTrackMutedChanged, removeRemoteTrack } from '../../store/actions/track';
-import { getRandomColor, getUserById } from '../../utils';
+import { addRemoteTrack, remoteAllLocalTracks, remoteTrackMutedChanged, removeRemoteTrack } from '../../store/actions/track';
+import { getUserById } from '../../utils';
 import Home from '../home';
 import ParticipantsSummary from '../../components/space/ParticipantsSummary';
 import { setRaiseHand } from '../../store/actions/layout';
 import ReconnectDialog from '../../components/shared/ReconnectDialog';
 import { addParticipant, removeParticipant } from '../../store/actions/participant';
+import { addSubRole } from '../../store/actions/profile';
+import {USER_ROLE} from "../../constants";
+import {addLocalTrack} from "../../store/actions/track";
+import RequestToSpeak from '../../components/shared/RequestToSpeak';
 
 const Space = () => {
 
@@ -29,8 +34,9 @@ const Space = () => {
     const [dominantSpeakerId, setDominantSpeakerId] = useState(null);
     const [lobbyUserJoined, setLobbyUserJoined] = useState({});
     const [minimize, setMinimize] = useState(false);
+    const profile = useSelector(state=>state.profile);
+    const [requestToSpeak, setRequestToSpeak] = useState(null);
 
-    
     const handleMinimize = ()=> {
         setMinimize(!minimize);
     }
@@ -43,6 +49,16 @@ const Space = () => {
     const denyLobbyAccess = () => {
         conference.lobbyDenyAccess(lobbyUserJoined.id);
         setLobbyUserJoined({});
+    }
+
+    const requestToSpeakAllow = ()=>{
+        conference.sendCommand("userRoleChanged", { attributes: {participantId: requestToSpeak.participantId, role: USER_ROLE.SPEAKER }});
+        conference.revokeOwner(requestToSpeak.participantId);
+        setRequestToSpeak({});
+    }
+
+    const requestToSpeakDeny = ()=>{
+        setRequestToSpeak({});
     }
 
     const updateNetwork = () => { // set internet connectivity status
@@ -99,14 +115,15 @@ const Space = () => {
             setDominantSpeakerId(id);
         });
 
-        conference.addEventListener(SariskaMediaTransport.events.conference.PARTICIPANT_PROPERTY_CHANGED, (participant, key, oldValue, newValue) => {
+        conference.addEventListener(SariskaMediaTransport.events.conference.PARTICIPANT_PROPERTY_CHANGED, async(participant, key, oldValue, newValue) => {
             if (key === "handraise" && newValue === "start") {
                 dispatch(setRaiseHand({ participantId: participant._id, raiseHand: true}));
             }
+            
             if (key === "handraise" && newValue === "stop") {
                 dispatch(setRaiseHand({ participantId: participant._id, raiseHand: false}));
             }
-            dispatch(userRoleChanged());
+            dispatch(participantPropertyChanged());
         });
 
         conference.addEventListener(SariskaMediaTransport.events.conference.USER_ROLE_CHANGED, (id, role) => {
@@ -129,13 +146,6 @@ const Space = () => {
             setLobbyUserJoined({id, displayName});
         });
         
-        conference.addEventListener(SariskaMediaTransport.events.conference.USER_JOINED, (id, participant) => {
-            dispatch(addThumbnailColor({partcipantId: id, color: getRandomColor()}));
-            if (!participant._hidden) {
-                dispatch(addParticipant(participant));
-            }
-        });
-
         conference.addEventListener(SariskaMediaTransport.events.conference.USER_LEFT, (id) => {
             dispatch(removeThumbnailColor(id));
             dispatch(removeParticipant(id));
@@ -164,19 +174,39 @@ const Space = () => {
             dispatch(setAudioLevel({participantId, audioLevel}));
         });
 
-        conference.addCommandListener("subRoleChanged", (data) => {
-            
-            console.log("addCommandListener", data);
+        conference.addCommandListener("userRoleChanged", async(data) => {
+            if (conference.myUserId() === data?.attributes?.participantId) {
+                const newRole = data?.attributes?.role;
+                if ( profile?.subRole === USER_ROLE.LISTENER && (newRole ===  USER_ROLE.SPEAKER || newRole === USER_ROLE.CO_HOST || newRole === USER_ROLE.HOST)) {
+                    const options = { devices: ["audio"] };
+                    const newLocalTracks = await SariskaMediaTransport?.createLocalTracks(options);
+                    newLocalTracks?.forEach((track) => dispatch(addLocalTrack(track)));
+                }
+    
+                if ( newRole === USER_ROLE.LISTENER) {
+                    localTracks?.forEach(async track => await track.dispose());
+                    dispatch(remoteAllLocalTracks());
+                }
 
-            if (conference.myUserId() === data.partcipantId) {
-                conference.setLocalParticipantProperty("subRole", data.role);
-                dispatch(userRoleChanged());
+                conference.setLocalParticipantProperty("subRole", data?.attributes?.role);
+                dispatch(addSubRole(data?.attributes?.role));
+                dispatch(updateParticipantRole(data?.attributes));
+            }
+        });
+
+        conference.addCommandListener("requestToSpeak", async (data) => {
+            if (conference.myUserId() === data?.attributes?.hostId) {
+                
+                console.log("requestToSpeak", requestToSpeak);
+
+                setRequestToSpeak(data?.attributes);
             }
         });
 
         window.addEventListener("offline", updateNetwork);
         window.addEventListener("online", updateNetwork);
         window.addEventListener("beforeunload", destroy);
+
         return () => {
             destroy();
         };
@@ -196,6 +226,7 @@ const Space = () => {
             <ParticipantsSummary handleMinimize={handleMinimize}/>
             <SnackbarBox notification={notification}/>
             <ReconnectDialog open={layout.disconnected}/>
+            {requestToSpeak?.participantId && <RequestToSpeak requestToSpeak={requestToSpeak} allow={requestToSpeakAllow} deny={requestToSpeakDeny} />}
         </div>
     )
 }

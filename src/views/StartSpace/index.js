@@ -153,8 +153,11 @@ const StartSpace = () => {
       setLoading(false);
     });
 
-    conference.addEventListener(SariskaMediaTransport.events.conference.USER_JOINED, (id) => {
+    conference.addEventListener(SariskaMediaTransport.events.conference.USER_JOINED, (id, participant) => {
       dispatch(addThumbnailColor({ participantId: id, color: getRandomColor() }));
+      if (!participant._hidden) {
+        dispatch(addParticipant(participant));
+      }
     });
 
     conference.addEventListener(SariskaMediaTransport.events.conference.CONFERENCE_FAILED, async (error) => {

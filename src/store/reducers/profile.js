@@ -2,6 +2,8 @@ import { SET_PROFILE, SET_SUB_ROLE, SET_SPACE_TITLE, SET_SPACE_TYPE} from "../ac
 
 const persistedData = JSON.parse(localStorage.getItem("reduxState") || "{}");
 
+console.log("persistedData", persistedData);
+
 const initialState = {
     name: persistedData.name,
     spaceTitle: '',
