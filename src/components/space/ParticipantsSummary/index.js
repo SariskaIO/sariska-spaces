@@ -180,7 +180,7 @@ const unmuteAudio = async () => {
                     <MicOffOutlinedIcon /> : <MicNoneOutlinedIcon />}
         </StyledAudioFab>
       </Tooltip>)}
-      {participants.map(participant=><Audio track={remoteTracks[participant._id].find(track => track.isAudioTrack())} />)}
+      {Object.entries(remoteTracks).map(([key, value]) => <Audio track={value?.find(track => track.isAudioTrack())} />)}          
     </>
   );
 };   
