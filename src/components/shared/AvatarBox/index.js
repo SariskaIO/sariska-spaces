@@ -66,13 +66,10 @@ const AvatartBox = ({
     role,
     isActiveSpeaker,
     participantDetails,
-    participantTracks,
     localUserId,
     localHandRaise,
     onClick
 }) => {
-
-    const audioTrack = participantTracks?.find(track => track.isAudioTrack());
     const avatarColors = useSelector(state => state.color);
     const {raisedHandParticipantIds} = useSelector(state => state.layout);
 
@@ -85,9 +82,6 @@ const AvatartBox = ({
 
     return (
         <AvatarBoxContainer onClick={onClick}>
-            <Box>
-                {!audioTrack?.isLocal() && <Audio track={audioTrack}/>}
-            </Box>
             <AvatarCircle
                 style={{backgroundColor: avatarColor}}
                 src={participantDetails?.avatar ? participantDetails?.avatar: null }

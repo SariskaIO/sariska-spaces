@@ -227,22 +227,6 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
     ]
   }
 
-  useEffect(()=>{
-     document.addEventListener("click", ()=>{
-        //  if (contextHostMenu ) { 
-        //     setContextHostMenu(null);
-        //  }
-        //  if (contextCoHostMenu) {
-        //     setContextCoHostMenu(null);
-        //  }
-        //  if (setContextSpeakerMenu) {
-        //     setContextSpeakerMenu(null);
-        //  }
-        //  if (setContextListenerMenu) {
-        //     setContextListenerMenu(null);
-        //  }
-     });
-  },[]);
 
   console.log("participants", participants, conference.getParticipantsWithoutHidden());
 
@@ -261,7 +245,6 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
                   dominantSpeakerId === participant._id
                 }
                 participantDetails={participant?._identity?.user}
-                participantTracks={tracks[participant._id]}
                 localUserId={conference.myUserId()}
                 onClick={
                   (e) => handleContextHostMenu(e, participant._id)
@@ -286,7 +269,6 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
                   dominantSpeakerId === participant._id
                 }
                 participantDetails={participant?._identity?.user}
-                participantTracks={tracks[participant._id]}
                 localUserId={conference.myUserId()}
                 localHandRaise={localHandRaise}
                 onClick={
@@ -312,7 +294,6 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
                   dominantSpeakerId === participant._id
                 }
                 participantDetails={participant?._identity?.user}
-                participantTracks={tracks[participant._id]}
                 localUserId={conference.myUserId()}
                 localHandRaise={localHandRaise}
                 onClick={
@@ -338,7 +319,6 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
                   dominantSpeakerId === participant._id
                 }
                 participantDetails={participant?._identity?.user}
-                participantTracks={tracks[participant._id]}
                 localUserId={conference.myUserId()}
                 localHandRaise={localHandRaise}
                 onClick={
