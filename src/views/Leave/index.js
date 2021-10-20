@@ -44,7 +44,7 @@ const Leave = () => {
 
     return (
         <StyledBox >
-            <Typography variant="h3">You have left the meeting</Typography>
+            <Typography variant="h3">You have left the Stage</Typography>
             <Box>
                 <Rejoin to={`/${spaceTitle}`} >Rejoin</Rejoin>
                 <GoHome to='/' >Go to Home</GoHome>

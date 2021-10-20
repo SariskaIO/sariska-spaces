@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import { Fab, Stack, styled, Tooltip } from "@mui/material";
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
@@ -12,102 +12,109 @@ import { color } from "../../../assets/colors";
 import { useDispatch, useSelector } from "react-redux";
 import { localTrackMutedChanged, remoteTrackMutedChanged } from "../../../store/actions/track";
 import { useHistory, useParams } from 'react-router-dom';
+import BasicDialogue from "../../shared/BasicDialogue";
 
 const StyledFab = styled(Fab)(({ theme }) => ({
   width: "48px",
   height: "48px",
   lineHeight: "36px",
   marginRight: theme.spacing(1),
+  boxShadow: 'none',
   "&>svg": {
     fontSize: "1.6rem",
     color: color.gray,
   },
 }));
-const SpaceFooterActions = () => {
-    const [mute, setMute] = useState(false);
+const SpaceFooterActions = ({dominantSpeakerId, setLocalHandRaise}) => {
     const [muteAll, setMuteAll] = useState(false);
     const [audioTrack] = useSelector(state => state.localTrack);
-    const localTracks = useSelector(state => state.localTrack);
     const remoteTracks = useSelector(state => state.remoteTrack);
     const [raiseHand, setRaiseHand] = useState(false);
     const conference = useSelector(state=>state.conference);
-    const localUser = conference.getLocalUser();
+    const [inviteOpen, setInviteOpen] = useState(false);
     const dispatch = useDispatch()
     const queryParams = useParams();
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    let userRole = Object.fromEntries(urlSearchParams?.entries())?.role;
-    console.log('all tr', audioTrack, remoteTracks);
+    const participants = useSelector(state=>state.participant);
+    const profile = useSelector((state) => state.profile);
+  
 
-    //merge local and remote track
-  let tracks = {
-    ...remoteTracks,
-    [localUser.id]: localTracks,
+  const handleClickInviteOpen = () => {
+    setInviteOpen(!inviteOpen);
   };
 
-  const participantIds = Object.keys(tracks);
-  
   const startRaiseHand = () => {
     conference.setLocalParticipantProperty("handraise", "start");
     setRaiseHand(true);
-};
-const stopRaiseHand = () => {
+    setLocalHandRaise(true);
+  };
+  
+  const stopRaiseHand = () => {
     conference.setLocalParticipantProperty("handraise", "stop");
     setRaiseHand(false);
-};
-  const handleMuteClick = () => {
-    setMute(!mute)
+    setLocalHandRaise(false);
   };
-  const handleMuteAllClick = () => {
-    setMuteAll(!muteAll);
-    participantIds.map((track) => (
-      conference.muteParticipant(track, 'audio')
-    ))
-    dispatch(localTrackMutedChanged());
+  
+  const handleMuteAllClick = async() => {
+    for (let [key, value] of Object.entries(remoteTracks)) {
+       await conference.muteParticipant(key, "audio") 
+    }
     dispatch(remoteTrackMutedChanged());
+    setMuteAll(true);
   }
 
   const muteAudio = async () => {
-    await audioTrack.mute();
-    dispatch(localTrackMutedChanged());
-};
+      await audioTrack?.mute();
+      dispatch(localTrackMutedChanged());
+  };
 
-const unmuteAudio = async () => {
-    await audioTrack.unmute();
-    dispatch(localTrackMutedChanged());
-};
+  const unmuteAudio = async () => {
+      await audioTrack?.unmute();
+      dispatch(localTrackMutedChanged());
+  };
 
-const handleManageSpace = () => {
-  history.push(`/invite/${queryParams.spaceId}`);
-}
+  const handleManageSpace = () => {
+    history.push(`/invite/${queryParams.spaceId}`);
+  }
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const history = useHistory();
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
+  console.log('buyt', conference?.getLocalUser(), audioTrack, participants, profile);
+
   return (
-    <Stack direction="row" justifyContent="end" sx={{ p: 1, mt: 2 }}>
+    <Stack direction="row" justifyContent="center" sx={{ p: 1, mt: 2 }}>
       <Tooltip title={ raiseHand ? "Hand Down" : "Raise Hand"} placement="top" arrow>
         <StyledFab sx={raiseHand && {background: color.yellow, '&:hover': {background: color.yellow, opacity: '0.8'}}} onClick={raiseHand ? stopRaiseHand : startRaiseHand}>
           <PanToolOutlinedIcon />
         </StyledFab>
       </Tooltip>
-      <Tooltip title={audioTrack?.isMuted() ? "Unmute Audio" : "Mute Audio"} placement="top" arrow>
+      {/* {profile.subRole === "listener" ? (
+      <Tooltip title="listeners are muted" placement="top" arrow>
+        <StyledFab sx={{background: color.yellow}}>
+                    <MicOffOutlinedIcon />
+        </StyledFab>
+      </Tooltip>)
+      : (
+        <Tooltip title={audioTrack?.isMuted() ? "Unmute Audio" : "Mute Audio"} placement="top" arrow>
         <StyledFab sx={audioTrack?.isMuted() && {background: color.yellow, '&:hover': {background: color.yellow, opacity: '0.8'}}} onClick={audioTrack?.isMuted() ?
-                    unmuteAudio : muteAudio} disabled={userRole === "listener"}>
+                    unmuteAudio : muteAudio}>
         {audioTrack?.isMuted() ?
                     <MicOffOutlinedIcon /> : <MicNoneOutlinedIcon />}
         </StyledFab>
-      </Tooltip>
+      </Tooltip>)} */}
       <Tooltip title="Manage Space" placement="top" arrow>
-        <StyledFab onClick={handleManageSpace}>
+        <StyledFab onClick={handleClickInviteOpen}>
           <ManageAccountsIcon />
         </StyledFab>
       </Tooltip>
+      {inviteOpen && <BasicDialogue open={inviteOpen} handleclose={handleClickInviteOpen} />}
       <Tooltip title="Mute All" placement="top" arrow>
-        <StyledFab sx={muteAll && {background: color.yellow, '&:hover': {background: color.yellow, opacity: '0.8'}}} onClick={handleMuteAllClick} disabled={userRole==="speaker" || userRole === "listener"}>
+        <StyledFab sx={muteAll && {background: color.yellow, '&:hover': {background: color.yellow, opacity: '0.8'}}} onClick={handleMuteAllClick}>
           <VolumeUpOutlinedIcon />
         </StyledFab>
       </Tooltip>

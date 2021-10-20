@@ -46,7 +46,7 @@ export function createDeferred() {
 }
 
 
-export async function getToken(roomName, profile, name,  isModerator) {
+export async function getToken(roomName, profile, isModerator) {
     const body = {
         method: "POST",
         headers: {
@@ -58,7 +58,7 @@ export async function getToken(roomName, profile, name,  isModerator) {
             user: {
                 id: profile.id,
                 avatar: profile.avatar,
-                name: name,
+                name: profile.name,
                 email: profile.email,
                 moderator: isModerator
             }
@@ -69,7 +69,6 @@ export async function getToken(roomName, profile, name,  isModerator) {
         const response = await fetch(GENERATE_TOKEN_URL, body);
         if (response.ok) {
             const json = await response.json();
-            localStorage.setItem(`sariska_${roomName}${name}`, json.token);
             return json.token;
         } else {
             console.log(response.status);

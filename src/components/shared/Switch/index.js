@@ -1,9 +1,7 @@
 import * as React from "react";
 import Switch from "@mui/material/Switch";
 import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
 import { Typography } from "@mui/material";
 import {styled} from "@mui/material/styles";
 import { color } from "../../../assets/colors";
@@ -91,7 +89,7 @@ export default function Switches({disabled, checked, setChecked}) {
   
   return (
     <StyledFormControl component="fieldset">
-    <StyledTypography>Choose Space Type</StyledTypography>
+    <StyledTypography>Choose Stage Type</StyledTypography>
       <StyledFormGroup aria-label="position">
         <SwitchTypography>Public</SwitchTypography>
             {disabled ? <IOSSwitch color="primary" checked={checked==="true" ? true : false} onChange={handleChange} disabled /> :

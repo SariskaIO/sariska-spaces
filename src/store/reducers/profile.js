@@ -1,12 +1,17 @@
-import { USER_ROLE } from "../../constants";
-import { SET_PROFILE, UPDATE_PROFILE, SET_SPACE_TITLE} from "../actions/types";
+import { SET_PROFILE, SET_SUB_ROLE, SET_SPACE_TITLE, SET_SPACE_TYPE} from "../actions/types";
+
+const persistedData = JSON.parse(localStorage.getItem("reduxState") || "{}");
+
+console.log("persistedData", persistedData);
 
 const initialState = {
-    name: '',
+    name: persistedData.name,
     spaceTitle: '',
-    avatar: "",
-    role: USER_ROLE.SPEAKER,
-    id: ""
+    avatar: persistedData.avatar,
+    role: persistedData.role,
+    id: persistedData.id,
+    subRole: persistedData.subRole,
+    spaceType: "public"
 };
 
 export const profile = (state = initialState, action) => {
@@ -18,13 +23,15 @@ export const profile = (state = initialState, action) => {
             state.id = id;
             state.role = role;
             return {...state};
-        case UPDATE_PROFILE:
-            state.name = action.payload.name;
-            state.role = action.payload.role? action.payload.role : state.role;
+        case SET_SUB_ROLE:
+            state.subRole = action.payload;
             return {...state};
         case SET_SPACE_TITLE:
-            state.spaceTitle = action.payload.spaceTitle;
+            state.spaceTitle = action.payload;
             return {...state};
+        case SET_SPACE_TYPE:
+            state.spaceType = action.payload;
+            return {...state};     
         default:
             return state
     }

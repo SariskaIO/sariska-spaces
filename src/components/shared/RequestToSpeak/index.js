@@ -19,15 +19,14 @@ const Controls = styled(Box)(()=>({
     marginTop: "20px"
 }))
 
-export default function PermissionDialog({displayName, allowLobbyAccess, denyLobbyAccess}) {
-
+export default function RequestToSpeak({allow, deny, requestToSpeak}) {
     return (
         <Root>
             <Card>
-                <div>Someone wants to join {displayName}</div>
+                <div>{requestToSpeak.participantName} wants to speak</div>
                 <Controls>
-                    <Button onClick={denyLobbyAccess}>Deny</Button>
-                    <Button onClick={allowLobbyAccess}>Allow</Button>
+                    <Button onClick={deny}>Deny</Button>
+                    <Button onClick={allow}>Allow</Button>
                 </Controls>
             </Card>
         </Root>
