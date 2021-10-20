@@ -12,6 +12,7 @@ import { clearAllReducers } from "../../../store/actions/conference";
 import MicNoneOutlinedIcon from "@mui/icons-material/MicNoneOutlined";
 import MicOffOutlinedIcon from "@mui/icons-material/MicOffOutlined";
 import { localTrackMutedChanged } from "../../../store/actions/track";
+import Audio from  "../../shared/Audio";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   background: color.gray,
@@ -98,13 +99,12 @@ const StyledCaption = styled(Typography)(() => ({
 }));
 const ParticipantsSummary = ({ handleDialogue, handleLeave, handleMinimize }) => {
   const profile = useSelector(state=>state.profile);
-  const conference = useSelector(state => state.conference);
-  const localUser = conference.getLocalUser();
   const history = useHistory();
   const participants = useSelector(state=>state.participant);
   const hosts = participants.filter(item=>item._properties?.subRole === USER_ROLE.HOST);
   const others = participants.filter(item=>item._properties?.subRole !== USER_ROLE.HOST);
   const [audioTrack] = useSelector(state => state.localTrack);
+  const remoteTracks = useSelector(state=>state.remoteTrack);
   const dispatch = useDispatch();
   
   const muteAudio = async () => {
@@ -180,8 +180,9 @@ const unmuteAudio = async () => {
                     <MicOffOutlinedIcon /> : <MicNoneOutlinedIcon />}
         </StyledAudioFab>
       </Tooltip>)}
+      {participants.map(participant=><Audio track={remoteTracks[participant._id].find(track => track.isAudioTrack())} />)}
     </>
   );
-};
+};   
 
 export default ParticipantsSummary;

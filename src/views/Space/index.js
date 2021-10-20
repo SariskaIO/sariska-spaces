@@ -181,7 +181,9 @@ const Space = () => {
                 if ( profile?.subRole === USER_ROLE.LISTENER && (newRole ===  USER_ROLE.SPEAKER || newRole === USER_ROLE.CO_HOST || newRole === USER_ROLE.HOST)) {
                     const options = { devices: ["audio"] };
                     const newLocalTracks = await SariskaMediaTransport?.createLocalTracks(options);
-                    newLocalTracks?.forEach((track) => dispatch(addLocalTrack(track)));
+                    const [audioTrack] = newLocalTracks;
+                    dispatch(addLocalTrack(audioTrack));
+                    await conference.addTrack(audioTrack);
                 }
     
                 if ( newRole === USER_ROLE.LISTENER) {

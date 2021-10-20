@@ -6,7 +6,6 @@ import { USER_ROLE } from "../../../constants";
 import AvatarBox from "../AvatarBox";
 import ContextMenu from "../ContextMenu";
 //import CaptionBox from '../../../shared/CaptionBox';
-import { localTrackMutedChanged, remoteTrackMutedChanged } from '../../../store/actions/track';
 
 const Title = styled(Typography)(() => ({
   fontWeight: 600,
@@ -45,19 +44,8 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
   const [contextListenerMenu, setContextListenerMenu] = React.useState(null);
   const spaceTitle = useSelector((state) => state.profile?.spaceTitle);
   const conference = useSelector((state) => state.conference);
-  const localTracks = useSelector((state) => state.localTrack);
-  const remoteTracks = useSelector((state) => state.remoteTrack);
   const profile = useSelector((state) => state.profile);
-  const localUser = conference?.getLocalUser();
-  const dispatch = useDispatch();
-  const [audioTrack] = localTracks;
   const participants = useSelector(state=>state.participant);
-
-  //merge local and remote track
-  let tracks = {
-    ...remoteTracks,
-    [localUser.id]: localTracks,
-  };
 
   const handleContextHostMenu = (event, id) => {
     setContextHostMenu(
