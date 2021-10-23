@@ -75,9 +75,6 @@ const AvatartBox = ({
 
 
     let avatarColor = avatarColors[participantDetails?.id];
-    console.log("avatarColors", avatarColor, raisedHandParticipantIds, localUserId, participantDetails);
-
-
     const coHostOrSpeaker = (role === USER_ROLE.SPEAKER || role === USER_ROLE.HOST || role === USER_ROLE.CO_HOST);
 
     return (

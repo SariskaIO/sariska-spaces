@@ -84,8 +84,6 @@ const SpaceFooterActions = ({dominantSpeakerId, setLocalHandRaise}) => {
     setAnchorEl(event.currentTarget);
   };
 
-  console.log('buyt', conference?.getLocalUser(), audioTrack, participants, profile);
-
   return (
     <Stack direction="row" justifyContent="center" sx={{ p: 1, mt: 2 }}>
       <Tooltip title={ raiseHand ? "Hand Down" : "Raise Hand"} placement="top" arrow>

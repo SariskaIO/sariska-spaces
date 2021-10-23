@@ -158,8 +158,9 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
 
     if (selectedItem === "Request To Speak") {
       console.log("Request To Speak");
-       const participant = conference.getParticipantsWithoutHidden().find(item=>item._properties.subRole === USER_ROLE.HOST);
-       conference.sendCommandOnce("requestToSpeak", { attributes: { participantId, hostId:  participant._id, participantName: participants.find(item=>item._id === participantId)?._identity?.user?.name}});
+      const participant = conference.getParticipantsWithoutHidden().find(item=>item._properties.subRole === USER_ROLE.HOST);
+      conference.sendCommand("requestToSpeak", { attributes: { participantId, hostId:  participant._id, participantName: participants.find(item=>item._id === participantId)?._identity?.user?.name}});
+      conference.removeCommand("requestToSpeak");
     }
     setContextListenerMenu(null);
   };
@@ -214,9 +215,6 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
       { title: 'Request To Speak' },
     ]
   }
-
-
-  console.log("participants", participants, conference.getParticipantsWithoutHidden());
 
   return (
     <Box>
@@ -299,7 +297,6 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
 
           {participants.map(participant =>
              participant._properties?.subRole === USER_ROLE.LISTENER && <>
-              {console.log(participant)}
               <AvatarBox
                 role={USER_ROLE.LISTENER}
                 key={participant._id}

@@ -121,7 +121,7 @@ const unmuteAudio = async () => {
     history.push("/leave");
     dispatch(clearAllReducers());
   };
-  console.log('hostss', hosts)
+
   return (
     <>
       <StyledBox onClick={handleMinimize}>

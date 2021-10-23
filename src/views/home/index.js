@@ -24,9 +24,7 @@ const Home = () => {
   SariskaMediaTransport.initialize();
   SariskaMediaTransport.setLogLevel(SariskaMediaTransport.logLevels.ERROR); //TRACE ,DEBUG, INFO, LOG, WARN, ERROR
 
-  const handleSetTerms = () => {
-    
-    console.log("userRole", userRole, spaceType)
+  const handleSetTerms = () => {    
     if (queryParams.spaceId && userRole !== undefined && spaceType  !== undefined) {
       history.push(`/terms/${queryParams.spaceId}?spacetype=${spaceType}&role=${userRole}`);
     } else if ( queryParams.spaceId ) {

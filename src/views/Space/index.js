@@ -54,11 +54,11 @@ const Space = () => {
     const requestToSpeakAllow = ()=>{
         conference.sendCommand("userRoleChanged", { attributes: {participantId: requestToSpeak.participantId, role: USER_ROLE.SPEAKER }});
         conference.revokeOwner(requestToSpeak.participantId);
-        setRequestToSpeak({});
+        setRequestToSpeak(null);
     }
 
     const requestToSpeakDeny = ()=>{
-        setRequestToSpeak({});
+        setRequestToSpeak(null);
     }
 
     const updateNetwork = () => { // set internet connectivity status
@@ -134,7 +134,6 @@ const Space = () => {
 
         conference.addEventListener(SariskaMediaTransport.events.conference.KICKED, (participant)=> { // if a user kicked by moderator 
             // kicked participant id
-            console.log('letre', participant._identity.user.name)
             dispatch(showNotification({message: ` Participant ${participant._identity.user.name} has been removed`, autoHide: false, severity: "info"}));
           });
 
@@ -176,6 +175,8 @@ const Space = () => {
         });
 
         conference.addCommandListener("userRoleChanged", async(data) => {
+            console.log("userRoleChanged", data);
+            
             if (conference.myUserId() === data?.attributes?.participantId) {
                 const newRole = data?.attributes?.role;
                 if ( profile?.subRole === USER_ROLE.LISTENER && (newRole ===  USER_ROLE.SPEAKER || newRole === USER_ROLE.CO_HOST || newRole === USER_ROLE.HOST)) {
@@ -197,11 +198,11 @@ const Space = () => {
             }
         });
 
+        console.log("space mount......");
+        
         conference.addCommandListener("requestToSpeak", async (data) => {
+            console.log("requestToSpeak", data);
             if (conference.myUserId() === data?.attributes?.hostId) {
-                
-                console.log("requestToSpeak", requestToSpeak);
-
                 setRequestToSpeak(data?.attributes);
             }
         });
@@ -222,10 +223,6 @@ const Space = () => {
     return (
         <div>
             {!minimize && <ParticipantsGrid dominantSpeakerId={dominantSpeakerId} handleMinimize={handleMinimize} />}
-            {/* {lobbyUserJoined.id && <PermissionDialog
-                denyLobbyAccess={denyLobbyAccess}
-                allowLobbyAccess={allowLobbyAccess}
-                displayName={lobbyUserJoined.displayName}/>} */}
             <ParticipantsSummary handleMinimize={handleMinimize}/>
             <SnackbarBox notification={notification}/>
             <ReconnectDialog open={layout.disconnected}/>

@@ -43,7 +43,6 @@ export default function SettingsMenu({ anchorEl, open, setAnchorEl }) {
   }
 
   function copyText(role, text) {
-    console.log("role, text", role, text);
     navigator.clipboard.writeText(text);
 
     if (role === USER_ROLE.CO_HOST) {

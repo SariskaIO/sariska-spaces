@@ -201,7 +201,6 @@ const StartSpace = () => {
       setSpaceTitle(queryParams.spaceId);
       setChecked(spaceType);
     }
-    console.log("profile?.id", profile, profile?.id, profile.subRole, userRole, USER_ROLE.LISTENER);
     setUserId(profile?.id);
   }, [profile]);
 

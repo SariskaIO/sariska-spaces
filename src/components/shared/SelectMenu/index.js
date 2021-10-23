@@ -16,8 +16,6 @@ export default function SelectMenu({userId, handleChange, list}) {
   const handleOpen = () => {
     setOpen(true);
   };
-
-  console.log("userId", userId, list);
   
   return (
     <Box sx={{width: '95%'}}>
