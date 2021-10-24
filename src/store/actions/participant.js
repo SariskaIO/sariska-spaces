@@ -23,9 +23,9 @@ export const participantPropertyChanged = () => {
 }
 
 
-export const updateParticipantRole = (payload) => {
+export const updateLocalParticipantSubRole = (payload) => {
     return {
-        type: Constants.UPDATE_PARTICIPANT_ROLE,
+        type: Constants.UPDATE_LOCAL_PARTICIPANT_SUB_ROLE,
         payload
     }
 }

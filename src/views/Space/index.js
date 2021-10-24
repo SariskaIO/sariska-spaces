@@ -7,7 +7,7 @@ import SnackbarBox from '../../components/shared/Snackbar';
 import { setAudioLevel } from '../../store/actions/audioIndicator';
 import { unreadMessage } from '../../store/actions/chat';
 import { removeThumbnailColor } from '../../store/actions/color';
-import { participantPropertyChanged, updateParticipantRole } from '../../store/actions/participant';
+import { participantPropertyChanged, updateLocalParticipantSubRole } from '../../store/actions/participant';
 import { clearAllReducers } from '../../store/actions/conference';
 import { addMessage } from '../../store/actions/message';
 import { showNotification } from '../../store/actions/notification';
@@ -19,7 +19,7 @@ import { setRaiseHand } from '../../store/actions/layout';
 import ReconnectDialog from '../../components/shared/ReconnectDialog';
 import { addParticipant, removeParticipant } from '../../store/actions/participant';
 import { addSubRole } from '../../store/actions/profile';
-import {USER_ROLE} from "../../constants";
+import {USER_ROLE, USER_SUB_ROLE_CHANGED, REQUEST_TO_SPEAK} from "../../constants";
 import {addLocalTrack} from "../../store/actions/track";
 import RequestToSpeak from '../../components/shared/RequestToSpeak';
 
@@ -52,7 +52,7 @@ const Space = () => {
     }
 
     const requestToSpeakAllow = ()=>{
-        conference.sendCommand("userRoleChanged", { attributes: {participantId: requestToSpeak.participantId, role: USER_ROLE.SPEAKER }});
+        conference.sendEndpointMessage(requestToSpeak.participantId, { action: USER_SUB_ROLE_CHANGED, payload: {participantId: requestToSpeak.participantId, role: USER_ROLE.SPEAKER }});
         conference.revokeOwner(requestToSpeak.participantId);
         setRequestToSpeak(null);
     }
@@ -126,12 +126,6 @@ const Space = () => {
             dispatch(participantPropertyChanged());
         });
 
-        // conference.addEventListener(SariskaMediaTransport.events.conference.USER_ROLE_CHANGED, (id, role) => {
-        //     if (conference.isModerator()) {
-        //         conference.enableLobby();
-        //     }
-        // });
-
         conference.addEventListener(SariskaMediaTransport.events.conference.KICKED, (participant)=> { // if a user kicked by moderator 
             // kicked participant id
             dispatch(showNotification({message: ` Participant ${participant._identity.user.name} has been removed`, autoHide: false, severity: "info"}));
@@ -141,11 +135,6 @@ const Space = () => {
             dispatch(showNotification({message: `${actorParticipant} has removed ${kickedParticipant} for ${reason}`, autoHide: true, severity: "info"}));
         })
 
-        // conference.addEventListener(SariskaMediaTransport.events.conference.LOBBY_USER_JOINED, (id, displayName) => {
-        //     new Audio("https://sdk.sariska.io/knock_0b1ea0a45173ae6c10b084bbca23bae2.ogg").play();
-        //     setLobbyUserJoined({id, displayName});
-        // });
-        
         conference.addEventListener(SariskaMediaTransport.events.conference.USER_LEFT, (id) => {
             dispatch(removeThumbnailColor(id));
             dispatch(removeParticipant(id));
@@ -174,11 +163,10 @@ const Space = () => {
             dispatch(setAudioLevel({participantId, audioLevel}));
         });
 
-        conference.addCommandListener("userRoleChanged", async(data) => {
-            console.log("userRoleChanged", data);
-            
-            if (conference.myUserId() === data?.attributes?.participantId) {
-                const newRole = data?.attributes?.role;
+        conference.addEventListener(SariskaMediaTransport.events.conference.ENDPOINT_MESSAGE_RECEIVED, async ( participant, data) => {     
+            const { action, payload } = data;
+            if ( action === USER_SUB_ROLE_CHANGED) {
+                const newRole = payload?.role;
                 if ( profile?.subRole === USER_ROLE.LISTENER && (newRole ===  USER_ROLE.SPEAKER || newRole === USER_ROLE.CO_HOST || newRole === USER_ROLE.HOST)) {
                     const options = { devices: ["audio"] };
                     const newLocalTracks = await SariskaMediaTransport?.createLocalTracks(options);
@@ -192,28 +180,23 @@ const Space = () => {
                     dispatch(remoteAllLocalTracks());
                 }
 
-                conference.setLocalParticipantProperty("subRole", data?.attributes?.role);
-                dispatch(addSubRole(data?.attributes?.role));
-                dispatch(updateParticipantRole(data?.attributes));
+                conference.setLocalParticipantProperty("subRole", newRole);
+                dispatch(addSubRole(newRole));
+                dispatch(updateLocalParticipantSubRole(payload));
             }
-        });
 
-        console.log("space mount......");
-        
-        conference.addCommandListener("requestToSpeak", async (data) => {
-            console.log("requestToSpeak", data);
-            if (conference.myUserId() === data?.attributes?.hostId) {
-                setRequestToSpeak(data?.attributes);
+            if ( action === REQUEST_TO_SPEAK) {
+                setRequestToSpeak(payload);
             }
         });
 
         window.addEventListener("offline", updateNetwork);
         window.addEventListener("online", updateNetwork);
         window.addEventListener("beforeunload", destroy);
+    return () => {
+        destroy();
+    };
 
-        return () => {
-            destroy();
-        };
     },[conference]);
 
     if (!conference) {

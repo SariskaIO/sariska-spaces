@@ -2,7 +2,7 @@ import {
     ADD_PARTICIPANT,
     REMOVE_PARTICIPANT,
     PARTICIPANT_PROPERTY_CHANGED,
-    UPDATE_PARTICIPANT_ROLE
+    UPDATE_LOCAL_PARTICIPANT_SUB_ROLE
 } from "../actions/types";
 
 const initialState = [];
@@ -14,7 +14,7 @@ export const participant = (state = initialState, action) => {
                 state.push(action.payload);
             }
             return [...state];
-        case UPDATE_PARTICIPANT_ROLE:
+        case UPDATE_LOCAL_PARTICIPANT_SUB_ROLE:
             const index = state.findIndex(participant=>participant._id === action.payload.participantId);
             state[index] = {...state[index], _properties: {subRole: action.payload.role}};
             return [...state];

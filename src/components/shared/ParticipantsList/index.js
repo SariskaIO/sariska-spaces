@@ -2,7 +2,7 @@ import { Box, Divider, Stack, styled, Typography } from "@mui/material";
 import React, {useEffect, useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { color } from "../../../assets/colors";
-import { USER_ROLE } from "../../../constants";
+import { REQUEST_TO_SPEAK, USER_ROLE, USER_SUB_ROLE_CHANGED } from "../../../constants";
 import AvatarBox from "../AvatarBox";
 import ContextMenu from "../ContextMenu";
 //import CaptionBox from '../../../shared/CaptionBox';
@@ -100,12 +100,12 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
   const handleCoHostMenuClose = (selectedItem, participantId) => {
 
     if (selectedItem === "Make Host") {
-      conference.sendCommand("userRoleChanged", { attributes: {participantId, role: USER_ROLE.HOST }});
+      conference.sendEndpointMessage(participantId, {action: USER_SUB_ROLE_CHANGED, payload: {participantId, role: USER_ROLE.HOST }}); 
       conference.grantOwner(participantId);
     }
 
     if (selectedItem === "Make Speaker") {
-      conference.sendCommand("userRoleChanged", { attributes: {participantId, role: USER_ROLE.SPEAKER }});
+      conference.sendEndpointMessage(participantId, {action: USER_SUB_ROLE_CHANGED, payload: {participantId, role: USER_ROLE.SPEAKER }}); 
       conference.revokeOwner(participantId);
     }
 
@@ -121,12 +121,12 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
 
   const handleSpeakerMenuClose = (selectedItem, participantId) => {
     if (selectedItem === "Make Co-host") {
-      conference.sendCommand("userRoleChanged", { attributes: {participantId, role: USER_ROLE.CO_HOST }});
+      conference.sendEndpointMessage(participantId, {action: USER_SUB_ROLE_CHANGED, payload: {participantId, role: USER_ROLE.CO_HOST }}); 
       conference.grantOwner(participantId);
     }
 
     if (selectedItem === "Make Listener") {
-      conference.sendCommand("userRoleChanged", { attributes:{participantId, role: USER_ROLE.LISTENER }});
+      conference.sendEndpointMessage(participantId, {action: USER_SUB_ROLE_CHANGED, payload: {participantId, role: USER_ROLE.LISTENER }}); 
     }
 
     if (selectedItem === "Mute") {
@@ -141,7 +141,7 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
 
   const handleListenerMenuClose = (selectedItem, participantId) => {
     if (selectedItem === "Make Speaker") {
-      conference.sendCommand("userRoleChanged", { attributes: { participantId, role: USER_ROLE.SPEAKER }});
+      conference.sendEndpointMessage(participantId, {action: USER_SUB_ROLE_CHANGED, payload: {participantId, role: USER_ROLE.SPEAKER }}); 
     }
 
     if (selectedItem === "Remove Speaker") {
@@ -157,10 +157,9 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
     }
 
     if (selectedItem === "Request To Speak") {
-      console.log("Request To Speak");
-      const participant = conference.getParticipantsWithoutHidden().find(item=>item._properties.subRole === USER_ROLE.HOST);
-      conference.sendCommand("requestToSpeak", { attributes: { participantId, hostId:  participant._id, participantName: participants.find(item=>item._id === participantId)?._identity?.user?.name}});
-      conference.removeCommand("requestToSpeak");
+      const host = conference.getParticipantsWithoutHidden().find(item=>item._properties.subRole === USER_ROLE.HOST);
+      const participantName = participants.find(item=>item._id === participantId)?._identity?.user?.name;
+      conference.sendEndpointMessage(host._id, {action: REQUEST_TO_SPEAK, payload:  { participantId, hostId: host._id, participantName }}); 
     }
     setContextListenerMenu(null);
   };
