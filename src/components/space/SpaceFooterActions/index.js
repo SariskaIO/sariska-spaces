@@ -25,8 +25,7 @@ const StyledFab = styled(Fab)(({ theme }) => ({
     color: color.gray,
   },
 }));
-const SpaceFooterActions = ({dominantSpeakerId, setLocalHandRaise}) => {
-    const [muteAll, setMuteAll] = useState(false);
+const SpaceFooterActions = ({dominantSpeakerId, setLocalHandRaise, muteAll, handleMuteAllClick}) => {
     const [audioTrack] = useSelector(state => state.localTrack);
     const remoteTracks = useSelector(state => state.remoteTrack);
     const [raiseHand, setRaiseHand] = useState(false);
@@ -54,13 +53,13 @@ const SpaceFooterActions = ({dominantSpeakerId, setLocalHandRaise}) => {
     setLocalHandRaise(false);
   };
   
-  const handleMuteAllClick = async() => {
-    for (let [key, value] of Object.entries(remoteTracks)) {
-       await conference.muteParticipant(key, "audio") 
-    }
-    dispatch(remoteTrackMutedChanged());
-    setMuteAll(true);
-  }
+  // const handleMuteAllClick = async() => {
+  //   for (let [key, value] of Object.entries(remoteTracks)) {
+  //      await conference.muteParticipant(key, "audio") 
+  //   }
+  //   dispatch(remoteTrackMutedChanged());
+  //   setMuteAll(true);
+  // }
 
   const muteAudio = async () => {
       await audioTrack?.mute();
@@ -87,7 +86,7 @@ const SpaceFooterActions = ({dominantSpeakerId, setLocalHandRaise}) => {
   return (
     <Stack direction="row" justifyContent="center" sx={{ p: 1, mt: 2 }}>
       <Tooltip title={ raiseHand ? "Hand Down" : "Raise Hand"} placement="top" arrow>
-        <StyledFab sx={raiseHand && {background: color.yellow, '&:hover': {background: color.yellow, opacity: '0.8'}}} onClick={raiseHand ? stopRaiseHand : startRaiseHand}>
+        <StyledFab sx={raiseHand && {background: color.primary, '&:hover': {background: color.primary, opacity: '0.8'}}} onClick={raiseHand ? stopRaiseHand : startRaiseHand}>
           <PanToolOutlinedIcon />
         </StyledFab>
       </Tooltip>
@@ -112,12 +111,12 @@ const SpaceFooterActions = ({dominantSpeakerId, setLocalHandRaise}) => {
       </Tooltip>
       {inviteOpen && <BasicDialogue open={inviteOpen} handleclose={handleClickInviteOpen} />}
       <Tooltip title="Mute All" placement="top" arrow>
-        <StyledFab sx={muteAll && {background: color.yellow, '&:hover': {background: color.yellow, opacity: '0.8'}}} onClick={handleMuteAllClick}>
+        <StyledFab sx={muteAll && {background: color.primary, '&:hover': {background: color.primary, opacity: '0.8'}}} onClick={handleMuteAllClick}>
           <VolumeUpOutlinedIcon />
         </StyledFab>
       </Tooltip>
       <Tooltip title="Share" placement="top" arrow>
-        <StyledFab sx={open && {background: color.yellow, '&:hover': {background: color.yellow, opacity: '0.8'}}} onClick={handleClick}>
+        <StyledFab sx={open && {background: color.primary, '&:hover': {background: color.primary, opacity: '0.8'}}} onClick={handleClick}>
           <ShareOutlinedIcon />
         </StyledFab>
       </Tooltip>

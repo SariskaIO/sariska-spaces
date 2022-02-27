@@ -36,7 +36,7 @@ const Home = () => {
   
   useEffect(()=>{
     if(queryParams.spaceId){
-      setHomeButonText("Join a Stage")
+      setHomeButonText("Join Stage")
     }
   },[])
 

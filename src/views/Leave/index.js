@@ -18,29 +18,33 @@ import { color } from '../../assets/colors';
             }
       }));
       const Rejoin = styled(Link)(({theme}) => ({
-        color: color.yellow,
-            border: `1px solid ${color.yellow}`,
+        color: color.primary,
+            border: `1px solid ${color.primary}`,
             borderRadius: '10px',
             textTransform: 'capitalize',
             textDecoration:'none',
-            padding: theme.spacing(0.5, 2.5)
+            padding: theme.spacing(0.5, 2.5),
+            "&:hover": {
+                opacity: '0.8',
+                background: color.white
+            }
       }));
       const GoHome = styled(Link)(({theme}) => ({
         color: color.white,
                 textDecoration:'none',
-                border: `1px solid ${color.yellow}`,
+                border: `1px solid ${color.primary}`,
                 borderRadius: '10px',
-                background: color.yellow,
+                background: color.primary,
                 marginLeft: '20px',
                 textTransform: 'capitalize',
                 padding: theme.spacing(0.5, 2.5),
                 "&:hover": {
-                    color: color.yellow
+                    opacity: '0.8'
                 }
       }));
 
 const Leave = () => {
-    const spaceTitle  = useSelector(state=>state.profile?.spaceTitle);
+    const spaceTitle  = useParams().spaceId;
 
     return (
         <StyledBox >

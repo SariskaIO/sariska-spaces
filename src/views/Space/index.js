@@ -27,6 +27,7 @@ const Space = () => {
 
     const dispatch = useDispatch();
     const localTracks = useSelector(state => state.localTrack);
+    const remoteTracks = useSelector(state => state.remoteTrack);
     const conference = useSelector(state => state.conference);
     const connection = useSelector(state => state.connection);
     const layout = useSelector(state => state.layout);
@@ -36,6 +37,16 @@ const Space = () => {
     const [minimize, setMinimize] = useState(false);
     const profile = useSelector(state=>state.profile);
     const [requestToSpeak, setRequestToSpeak] = useState(null);
+    const [muteAll, setMuteAll] = useState(false);
+    
+    const handleMuteAllClick = async() => {
+        for (let [key, value] of Object.entries(remoteTracks)) {
+           await conference.muteParticipant(key, "audio") 
+        }
+        dispatch(remoteTrackMutedChanged());
+        setMuteAll(true);
+      }
+    
 
     const handleMinimize = ()=> {
         setMinimize(!minimize);
@@ -173,6 +184,7 @@ const Space = () => {
                     const [audioTrack] = newLocalTracks;
                     dispatch(addLocalTrack(audioTrack));
                     await conference.addTrack(audioTrack);
+                    newLocalTracks?.forEach((track) => dispatch(addLocalTrack(track)));
                 }
     
                 if ( newRole === USER_ROLE.LISTENER) {
@@ -207,6 +219,12 @@ const Space = () => {
         <div>
             {!minimize && <ParticipantsGrid dominantSpeakerId={dominantSpeakerId} handleMinimize={handleMinimize} />}
             <ParticipantsSummary handleMinimize={handleMinimize}/>
+            {!minimize && <ParticipantsGrid dominantSpeakerId={dominantSpeakerId} handleMinimize={handleMinimize} muteAll={muteAll} handleMuteAllClick={handleMuteAllClick}/>}
+            {/* {lobbyUserJoined.id && <PermissionDialog
+                denyLobbyAccess={denyLobbyAccess}
+                allowLobbyAccess={allowLobbyAccess}
+                displayName={lobbyUserJoined.displayName}/>} */}
+            <ParticipantsSummary dominantSpeakerId={dominantSpeakerId} handleMinimize={handleMinimize} muteAll={muteAll} handleMuteAllClick={handleMuteAllClick}/>
             <SnackbarBox notification={notification}/>
             <ReconnectDialog open={layout.disconnected}/>
             {requestToSpeak?.participantId && <RequestToSpeak requestToSpeak={requestToSpeak} allow={requestToSpeakAllow} deny={requestToSpeakDeny} />}

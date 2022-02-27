@@ -25,7 +25,7 @@ const HandRaise = styled(Box)(({theme})=>({
     "& svg":{
         fontSize: '1rem',
         borderRadius: '50%',
-        background: color.yellow,
+        background: color.primary,
         padding: '2px'
     }
 }))
@@ -95,7 +95,7 @@ const AvatartBox = ({
                 }
             <Name>{localUserId === participantDetails?.id ? "You" : participantDetails?.name}</Name>
             <Stack direction="row" alignItems="center">
-                <ImgContainer sx={ isActiveSpeaker ? {background: color.yellow} : coHostOrSpeaker ? {border: `1px solid ${color.yellow}`} : {background: color.border}}>
+                <ImgContainer sx={ isActiveSpeaker ? {background: color.primary} : coHostOrSpeaker ? {border: `1px solid ${color.primary}`} : {background: color.border}}>
                 {/* { coHostOrSpeaker && <img src={img} alt="host" height="15px" width= '100%'/>} */}
                 <Role >{role}</Role>
                 </ImgContainer>

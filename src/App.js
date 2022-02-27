@@ -17,7 +17,7 @@ function App() {
         <Route exact path="/" component={Home} />
         <Route exact path="/terms/:spaceId?" component={SpaceTerms} />
         <Route exact path="/start/:spaceId?" component={StartSpace} />
-        <Route exact path="/leave" component={Leave} />
+        <Route exact path="/leave/:spaceId" component={Leave} />
         <Route exact path='/invite/:spaceId?' component={InviteMembers} />
         <Route exact path='/invite/co-host/:spaceId' component={InviteCoHosts} />
         <Route exact path='/invite/speaker/:spaceId' component={InviteSpeakers} />

@@ -52,11 +52,11 @@ const AudioBox = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(3),
   marginBottom: theme.spacing(2),
   "& .MuiSvgIcon-root": {
-    border: `1px solid ${color.yellow}`,
+    border: `1px solid ${color.primary}`,
     padding: "12px",
     borderRadius: "50%",
     marginRight: "18px",
-    color: color.yellow,
+    color: color.primary,
     "&:hover": {
       background: color.white,
       cursor: "pointer",
@@ -105,7 +105,7 @@ const StartSpace = () => {
 
     setLoading(true);
     const isModerator = !queryParams.spaceId || userRole === USER_ROLE.HOST || userRole === USER_ROLE.CO_HOST;
-    const token = await getToken(spaceTitle, profile, isModerator);
+    const token = await getToken(spaceTitle, profile, userId, isModerator);
 
     if (!token) {
       return;
@@ -279,7 +279,7 @@ const StartSpace = () => {
               disabled={loading}
             />
           </Box>
-          {loading && <CircularProgress size={24} sx={{ color: color.yellow, marginTop: '-60px', marginLeft: '100px' }} />}
+          {loading && <CircularProgress size={24} sx={{ color: color.primary, marginTop: '-60px', marginLeft: '100px' }} />}
           <Snackbar
             anchorOrigin={{
               vertical: 'top',

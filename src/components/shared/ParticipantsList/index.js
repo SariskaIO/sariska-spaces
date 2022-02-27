@@ -18,8 +18,8 @@ const Title = styled(Typography)(() => ({
 const StyledDivider = styled(Divider)(() => ({
   width: '30%',
   borderBottomWidth: 'thick',
-  borderColor: color.yellow,
-  marginTop: '0.8rem',
+  borderColor: color.primary,
+  marginTop: '0.3rem',
   marginBottom: '1.3rem',
   marginLeft: '10px'
 }));

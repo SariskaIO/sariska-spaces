@@ -1,5 +1,6 @@
 
 export const localParticipantData = [
+    {name: 'User', id: 'xd4bvsf1'},
     {name: 'Guru', id: 'xdfvsf1'},
     {name: 'Bharath', id: 'xdf1sf2'},
     {name: 'Brajendra', id: 'xd3vsf3'  },

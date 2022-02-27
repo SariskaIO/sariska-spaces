@@ -14,8 +14,8 @@ const StyledBox = styled(Box)(({theme})=>({
     padding: theme.spacing(0.5, 2.5, 2, 2.5),
     position: 'absolute',
     bottom: theme.spacing(15),
-    right: 0,
-    top: 0,
+    right: '-1px',
+    top: '-1px',
     color: color.gray,
     border: `1px solid ${color.border}`,
     zIndex: 9999

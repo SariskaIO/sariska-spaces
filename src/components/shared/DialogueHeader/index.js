@@ -7,7 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { color } from '../../../assets/colors';
 import {useHistory} from 'react-router-dom';
 import { clearAllReducers } from '../../../store/actions/conference';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const StyledBox = styled(Box)(()=>({
     display: 'flex',
@@ -48,9 +48,10 @@ const StyledFab = styled(Fab)(()=>({
 const DialogueHeader = ({handleLeave, handleMinimize, closeTitle}) => {
     const history=useHistory();
     const dispatch = useDispatch();
+    const spaceTitle  = useSelector(state=>state.profile?.spaceTitle);
     
     const leaveConference = () => {
-        history.push("/leave");
+        history.push(`/leave/${spaceTitle}`);
         dispatch(clearAllReducers());
     };
     return (

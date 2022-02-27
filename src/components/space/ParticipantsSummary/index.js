@@ -16,7 +16,7 @@ import Audio from  "../../shared/Audio";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   background: color.gray,
-  border: `2px solid ${color.yellow}`,
+  border: `2px solid ${color.primary}`,
   minWidth: "390px",
   borderRadius: "20px",
   padding: "10px 20px 20px 0px",
@@ -31,7 +31,7 @@ const StyledBox = styled(Box)(({ theme }) => ({
   },
 }));
 const Name = styled(Typography)(({ theme }) => ({
-  color: color.yellow,
+  color: color.primary,
 }));
 const Title = styled(Typography)(({ theme }) => ({
   fontWeight: 600,
@@ -97,14 +97,14 @@ const StyledAudioFab = styled(Fab)(() => ({
 const StyledCaption = styled(Typography)(() => ({
   fontSize: "0.6rem",
 }));
-const ParticipantsSummary = ({ handleDialogue, handleLeave, handleMinimize }) => {
+const ParticipantsSummary = ({ handleDialogue, handleLeave, handleMinimize, dominantSpeakerId, muteAll, handleMuteAllClick }) => {
   const profile = useSelector(state=>state.profile);
   const history = useHistory();
   const participants = useSelector(state=>state.participant);
   const hosts = participants.filter(item=>item._properties?.subRole === USER_ROLE.HOST);
   const others = participants.filter(item=>item._properties?.subRole !== USER_ROLE.HOST);
   const [audioTrack] = useSelector(state => state.localTrack);
-  const remoteTracks = useSelector(state=>state.remoteTrack);
+  const remoteTracks = useSelector(state => state.remoteTrack);
   const dispatch = useDispatch();
   
   const muteAudio = async () => {
@@ -121,7 +121,6 @@ const unmuteAudio = async () => {
     history.push("/leave");
     dispatch(clearAllReducers());
   };
-
   return (
     <>
       <StyledBox onClick={handleMinimize}>
@@ -142,11 +141,11 @@ const unmuteAudio = async () => {
                 <Stack direction="row" alignItems="center">
                   <img height="40" src={img} alt="voice" />
                     {
-                      hosts.map((participant, index)=>{
+                      participants.map((participant, index)=>{
                         return (
-                         <Name>
+                         (participant?._id === dominantSpeakerId) && <Name>
                             { participant?._identity?.user?.name }  {" "}
-                            <StyledCaption variant="caption">(Host)</StyledCaption> 
+                            <StyledCaption variant="caption">({ participant?._properties.subRole})</StyledCaption> 
                           </Name>
                       )})
                     }
@@ -174,7 +173,7 @@ const unmuteAudio = async () => {
       </Tooltip>)
       : (
         <Tooltip title={audioTrack?.isMuted() ? "Unmute Audio" : "Mute Audio"} placement="top" arrow>
-        <StyledAudioFab sx={audioTrack?.isMuted() && {background: color.yellow, '&:hover': {background: color.yellow, opacity: '0.8'}}} onClick={audioTrack?.isMuted() ?
+        <StyledAudioFab sx={audioTrack?.isMuted() && {background: color.primary, '&:hover': {background: color.primary, opacity: '0.8'}}} onClick={audioTrack?.isMuted() ?
                     unmuteAudio : muteAudio}>
         {audioTrack?.isMuted() ?
                     <MicOffOutlinedIcon /> : <MicNoneOutlinedIcon />}

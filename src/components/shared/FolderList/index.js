@@ -23,7 +23,7 @@ export default function FolderList({data, background}) {
         {data.map((item, index)=>(
       <ListItem key={index}>
         <ListItemAvatar>
-          <Avatar sx={{color: color.yellow, background: 'none', border: `1px solid ${color.yellow}`}}>
+          <Avatar sx={{color: color.primary, background: 'none', border: `1px solid ${color.primary}`}}>
             {item.icon}
           </Avatar>
         </ListItemAvatar>
