@@ -87,19 +87,22 @@ const StartSpace = () => {
   };
 
   const handleSubmit = async () => {
+    let token;
+
     if (!spaceTitle) {
-      return;
+        return;
     }
+
     setLoading(true);
-    let token = localStorage.getItem(`sariska_${spaceTitle}${getUserName(localParticipantData, nameId)}`);
+    
     const isModerator = !queryParams.spaceId;
-    token = token ? token : await getToken(spaceTitle, profile, getUserName(localParticipantData, nameId), isModerator);
+    token =   await getToken(profile, getUserName(localParticipantData, nameId), isModerator);
     if (!token) {
       return;
     }
 
-    const connection = new SariskaMediaTransport.JitsiConnection(token);
-    
+    const connection = new SariskaMediaTransport.JitsiConnection(token, spaceTitle);
+
     connection.addEventListener(
       SariskaMediaTransport.events.connection.CONNECTION_ESTABLISHED,
       () => {
@@ -122,12 +125,13 @@ const StartSpace = () => {
 
     dispatch(setSpace({ spaceTitle }));
   };
+
   const createConference = async (connection) => {
     const conference = userRole==="listener" ? connection.initJitsiConference({startAudioMuted: true}) : connection.initJitsiConference();
     conference.addTrack(audioTrack);
       if(!queryParams.spaceId){
-      conference.setLocalParticipantProperty("host", "true");
-      dispatch(setHost({participantId: conference.getLocalUser().id, host: "true"}))
+        conference.setLocalParticipantProperty("host", "true");
+        dispatch(setHost({participantId: conference.getLocalUser().id, host: "true"}))
       }else {
         if(userRole==="cohost"){
           conference.setLocalParticipantProperty("cohost", "true");
@@ -140,7 +144,7 @@ const StartSpace = () => {
           conference.setLocalParticipantProperty("listener", "true");
           dispatch(makeListeners({participantId: conference.getLocalUser().id, listener: "true"}))
         }
-      }
+    }
     conference.addEventListener(
       SariskaMediaTransport.events.conference.CONFERENCE_JOINED,
       () => {
