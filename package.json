@@ -10,6 +10,7 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "env-cmd": "^10.1.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -20,12 +21,16 @@
     "redux-persist": "^6.0.0",
     "redux-promise": "^0.6.0",
     "redux-thunk": "^2.3.0",
+    "sariska-media-transport": "https://github.com/SariskaIO/sariska-media-transport.git",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "deploy": "aws s3 cp build s3://test.sariska.io --recursive --acl public-read && aws cloudfront create-invalidation --distribution-id E2GEKJL3QWLD6E --paths / /bundle.js /index.html",
-    "start": "react-scripts start",
+    "start": "env-cmd -f .env.development react-scripts start",
     "build": "react-scripts build",
+    "build:development": "env-cmd -f .env.development npm run build",
+    "build:production": "env-cmd -f .env.production npm run build",
+    "deploy:development": "aws s3 cp build s3://spaces.dev.sariska.io --recursive --acl public-read && aws cloudfront create-invalidation --distribution-id E275RCX4MF917V --paths / /bundle.js /index.html",
+    "deploy:production": "aws s3 cp build s3://spaces.sariska.io --recursive --acl public-read && aws cloudfront create-invalidation --distribution-id E1AU8FO1OT5IQC --paths / /bundle.js /index.html",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
