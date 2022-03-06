@@ -1,9 +1,7 @@
-
-import React, {useEffect} from 'react'
+import React from 'react'
 import { Box, Typography } from "@mui/material";
 import {Link, useParams} from 'react-router-dom';
 import { styled } from "@mui/material/styles";
-import {useSelector} from "react-redux";
 import { color } from '../../assets/colors';
 
     const StyledBox = styled(Box)(({theme}) => ({
@@ -18,33 +16,37 @@ import { color } from '../../assets/colors';
             }
       }));
       const Rejoin = styled(Link)(({theme}) => ({
-        color: color.yellow,
-            border: `1px solid ${color.yellow}`,
+        color: color.primary,
+            border: `1px solid ${color.primary}`,
             borderRadius: '10px',
             textTransform: 'capitalize',
             textDecoration:'none',
-            padding: theme.spacing(0.5, 2.5)
+            padding: theme.spacing(0.5, 2.5),
+            "&:hover": {
+                opacity: '0.8',
+                background: color.white
+            }
       }));
       const GoHome = styled(Link)(({theme}) => ({
         color: color.white,
                 textDecoration:'none',
-                border: `1px solid ${color.yellow}`,
+                border: `1px solid ${color.primary}`,
                 borderRadius: '10px',
-                background: color.yellow,
+                background: color.primary,
                 marginLeft: '20px',
                 textTransform: 'capitalize',
                 padding: theme.spacing(0.5, 2.5),
                 "&:hover": {
-                    color: color.yellow
+                    opacity: '0.8'
                 }
       }));
 
 const Leave = () => {
-    const spaceTitle  = useSelector(state=>state.profile?.spaceTitle);
+    const spaceTitle  = useParams().spaceId;
 
     return (
         <StyledBox >
-            <Typography variant="h3">You have left the meeting</Typography>
+            <Typography variant="h3">You have left the Stage</Typography>
             <Box>
                 <Rejoin to={`/${spaceTitle}`} >Rejoin</Rejoin>
                 <GoHome to='/' >Go to Home</GoHome>

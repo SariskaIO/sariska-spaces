@@ -1,4 +1,4 @@
-import {ADD_CONFERENCE, CLEAR_ALL, REMOVE_CONFERENCE} from "./types";
+import {ADD_CONFERENCE, CLEAR_ALL, REMOVE_CONFERENCE, USER_ROLE_CHANGED} from "./types";
 
 export const addConference = (conference) => {
     return {
@@ -16,5 +16,12 @@ export const removeConference = () => {
 export const clearAllReducers = () => {
     return {
         type: CLEAR_ALL
+    }
+}
+
+
+export const userRoleChanged = () => {
+    return {
+        type: USER_ROLE_CHANGED
     }
 }

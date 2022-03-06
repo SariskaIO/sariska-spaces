@@ -6,9 +6,11 @@ import { color } from '../../../assets/colors';
 const Root = styled(Grid)(({theme})=>({
     padding: theme.spacing(1, 0),
 }))
+
 const GridItem = styled(Grid)(({theme})=>({
     margin: theme.spacing(3, 0),
 }))
+
 const StyledTextField = styled(TextField)(({theme})=>({
     color: 'red',
         "& .MuiFormLabel-root.Mui-focused": {
@@ -21,9 +23,11 @@ const StyledTextField = styled(TextField)(({theme})=>({
             fontSize: '0.85rem'
         }
 }))
-const StyledIcon = styled(Grid)(({theme})=>({
-    background: `${color.yellow}`
-}))
+
+// const StyledIcon = styled(Grid)(({theme})=>({
+//     background: `${color.yellow}`
+// }))
+
 const StyledButton = styled(Button)(({theme})=>({
     color: `${color.primary}`, 
     borderColor: `${color.primary}`, 
@@ -32,7 +36,7 @@ const StyledButton = styled(Button)(({theme})=>({
     marginTop: '32px'
 }))
 
-const CopyLink = ({copySuccess, textToCopy, onClick}) => {
+const CopyLink = ({copySuccess, textToCopy, onClick, role}) => {
 
     return (
         <Root container item alignItems="center" >
@@ -48,8 +52,7 @@ const CopyLink = ({copySuccess, textToCopy, onClick}) => {
             </Grid>
             <GridItem item xs={12} >
                 <Box>
-                    <StyledButton variant="outlined"
-                            onClick={onClick}>{copySuccess ? 'Copy Again' : 'Copy'}</StyledButton>
+                    <StyledButton variant="outlined" onClick={()=>onClick(role, textToCopy)}>{copySuccess ? 'Copy Again' : 'Copy'}</StyledButton>
                     <Typography variant="subtitle2" style={{
                         color: `${color.primary}`,
                         borderColor: `${color.primary}`

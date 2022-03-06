@@ -46,7 +46,7 @@ export function createDeferred() {
 }
 
 
-export async function getToken(roomName, profile, name,  isModerator) {
+export async function getToken(roomName, profile, name, isModerator) {
     const body = {
         method: "POST",
         headers: {
@@ -54,11 +54,11 @@ export async function getToken(roomName, profile, name,  isModerator) {
         },
         body: JSON.stringify({
             sessionId: roomName, // enter your sessionId
-            apiKey: "27fd6f8080d512442a3694f461adb3986cda5ba39dbe368d75",
+            apiKey: `${process.env.REACT_APP_API_KEY}`,
             user: {
                 id: profile.id,
                 avatar: profile.avatar,
-                name: name,
+                name: profile.name,
                 email: profile.email,
                 moderator: isModerator
             }

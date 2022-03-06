@@ -1,7 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useMediaQuery, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 import { color } from '../../../assets/colors';
 
 const Anchor = styled(Button)((theme) => ({
@@ -19,7 +18,6 @@ const Anchor = styled(Button)((theme) => ({
 
 export default function ReconnectDialog({open}) {
     const theme = useTheme();
-    const history = useHistory();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     const handleClose = () => {
