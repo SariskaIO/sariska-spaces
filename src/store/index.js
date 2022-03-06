@@ -11,4 +11,6 @@ export const store = createStore(
     )
 );
 
-  
+window.addEventListener("beforeunload", ()=>{
+    localStorage.setItem('reduxState', JSON.stringify(store.getState().profile));  
+})

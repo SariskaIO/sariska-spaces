@@ -6,5 +6,11 @@ export const color = {
     border: 'rgba(66, 66, 66, 0.24)',
     red: 'red',
     text: 'rgba(0, 0, 0, 0.6)',
-    blue: '#3F7FD4'
+    blue: '#3F7FD4',
+    primaryLight: '#A9ECEF',
+    primary: '#27CED7',
+    primaryDark: '#093234',
+    secondaryLight: '#B7BFC9',
+    secondary: '#515D6B',
+    secondaryDark: '#1B1E23',
 }

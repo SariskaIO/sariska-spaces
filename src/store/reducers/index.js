@@ -5,14 +5,13 @@ import {connection} from "./connection";
 import {remoteTrack} from "./remoteTrack";
 import {localTrack} from "./localTrack";
 import {profile} from "./profile";
-import {media} from "./media";
 import {color} from "./color";
 import {audioIndicator} from "./audioIndicator";
 import { notification } from "./notification";
 import { message } from "./message";
 import { chat } from "./chat";
 import { layout } from "./layout";
-import {space} from "./space";
+import {participant} from "./participant";
 
 export const appReducer = combineReducers({
     conference,
@@ -20,23 +19,20 @@ export const appReducer = combineReducers({
     remoteTrack,
     localTrack,
     profile,
-    media,
     color,
     audioIndicator,
     notification,
     message,
     chat,
     layout,
-    space
+    participant
 });
+
 
 export const rootReducer = (state, action) => {
     if (action.type === CLEAR_ALL) {
-        return appReducer({
-            localTrack: [],
-            remoteTrack: {},
-            profile: state.profile
-        }, action);
+        const { routing } = state
+        state = { routing } 
     }
     return appReducer(state, action);
 }

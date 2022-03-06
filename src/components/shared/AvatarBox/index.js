@@ -2,9 +2,10 @@ import React from 'react';
 import { Avatar, Box, Stack, styled, Typography} from '@mui/material'
 import { color } from '../../../assets/colors';
 import img from '../../../assets/images/voice.gif';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Audio from '../Audio';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
+import { USER_ROLE } from '../../../constants';
 
 const AvatarBoxContainer = styled(Box)(({theme})=>({
     display: 'flex',
@@ -24,7 +25,7 @@ const HandRaise = styled(Box)(({theme})=>({
     "& svg":{
         fontSize: '1rem',
         borderRadius: '50%',
-        background: color.yellow,
+        background: color.primary,
         padding: '2px'
     }
 }))
@@ -40,16 +41,19 @@ const Name = styled(Typography)(({theme})=>({
     textTransform: 'capitalize'
 }))
 const Role = styled(Typography)(({theme})=>({
-    textTransform: 'capitalize'
+    textTransform: 'capitalize',
+    fontWeight: '600'
 }))
 const ImgContainer = styled(Box)(({theme})=>({
     display: 'flex',
     alignItems: 'center',
-    background: color.gray,
     width: '100%',
     borderRadius: '15px',
-    color: color.white,
+    color: color.gray,
+    fontWeight: '600',
     marginBottom: theme.spacing(1),
+    marginTop: theme.spacing(0.5),
+    padding: '3px 16px',
     "&>p":{
         fontSize: '0.6rem',
     },
@@ -62,40 +66,41 @@ const AvatartBox = ({
     role,
     isActiveSpeaker,
     participantDetails,
-    participantTracks,
     localUserId,
+    localHandRaise,
     onClick
 }) => {
-
-    const audioTrack = participantTracks.find(track => track.isAudioTrack());
     const avatarColors = useSelector(state => state.color);
-    const { pinnedPartcipantId, raisedHandParticipantIds } = useSelector(state => state.layout);
-    const dispatch = useDispatch();
+    const {raisedHandParticipantIds} = useSelector(state => state.layout);
+
+
     let avatarColor = avatarColors[participantDetails?.id];
+    const coHostOrSpeaker = (role === USER_ROLE.SPEAKER || role === USER_ROLE.HOST || role === USER_ROLE.CO_HOST);
 
     return (
         <AvatarBoxContainer onClick={onClick}>
-            <Box>
-                {!audioTrack?.isLocal() && <Audio track={audioTrack}/>}
-            </Box>
-                    <AvatarCircle
-                        src={participantDetails?.avatar ? participantDetails?.avatar: null }
-                        sx={{bgColor: avatarColor}}>{participantDetails?.name.slice(0, 1).toUpperCase()}
-                    </AvatarCircle>
-                    <HandRaiseBox sx={raisedHandParticipantIds[participantDetails?.id] ? {marginTop: '-37px'} : {marginTop: '-12px'}}>
-                    {raisedHandParticipantIds[participantDetails?.id] &&
-                        <HandRaise ><PanToolOutlinedIcon /></HandRaise>
-                    }
-                    </HandRaiseBox>
-                    <Name>{localUserId === participantDetails?.id ? "You" : participantDetails?.name}</Name>
-                    <Stack direction="row" alignItems="center">
-                        <ImgContainer style={(role ==="Speaker" || role ==="Host") ? {padding: '2px 12px 2px 4px' }: {padding:'2px 12px 2px 12px'}}>
-                        {(role ==="Speaker" || role ==="Host") && <img src={img} alt="host" height="15px" width= '100%'/>}
-                        <Role>{role}</Role>
-                        </ImgContainer>
-                    </Stack>
-                </AvatarBoxContainer>
-    )
+            <AvatarCircle
+                style={{backgroundColor: avatarColor}}
+                src={participantDetails?.avatar ? participantDetails?.avatar: null }
+                sx={{bgColor: avatarColor}}>{participantDetails?.name.slice(0, 1).toUpperCase()}
+            </AvatarCircle>
+            <HandRaiseBox sx={raisedHandParticipantIds[participantDetails?.id] ? {marginTop: '-37px'} : {marginTop: '-12px'}}>
+                {raisedHandParticipantIds[participantDetails?.id] &&
+                    <HandRaise ><PanToolOutlinedIcon /></HandRaise>
+                }
+            </HandRaiseBox>
+            {localHandRaise && (localUserId === participantDetails?.id) && <HandRaiseBox sx={{marginTop: '-22px'}}>
+                    <HandRaise ><PanToolOutlinedIcon /></HandRaise>
+            </HandRaiseBox>
+                }
+            <Name>{localUserId === participantDetails?.id ? "You" : participantDetails?.name}</Name>
+            <Stack direction="row" alignItems="center">
+                <ImgContainer sx={ isActiveSpeaker ? {background: color.primary} : coHostOrSpeaker ? {border: `1px solid ${color.primary}`} : {background: color.border}}>
+                {/* { coHostOrSpeaker && <img src={img} alt="host" height="15px" width= '100%'/>} */}
+                <Role >{role}</Role>
+                </ImgContainer>
+            </Stack>
+        </AvatarBoxContainer>)
 }
 
 export default AvatartBox

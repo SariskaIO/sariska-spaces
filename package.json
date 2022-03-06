@@ -32,7 +32,8 @@
     "deploy:development": "aws s3 cp build s3://spaces.dev.sariska.io --recursive --acl public-read && aws cloudfront create-invalidation --distribution-id E275RCX4MF917V --paths / /bundle.js /index.html",
     "deploy:production": "aws s3 cp build s3://spaces.sariska.io --recursive --acl public-read && aws cloudfront create-invalidation --distribution-id E1AU8FO1OT5IQC --paths / /bundle.js /index.html",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "aws s3 cp build s3://test.sariska.io --recursive --acl public-read && aws cloudfront create-invalidation --distribution-id E2GEKJL3QWLD6E --paths / /bundle.js /index.html"
   },
   "eslintConfig": {
     "extends": [

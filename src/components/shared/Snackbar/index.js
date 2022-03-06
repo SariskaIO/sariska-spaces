@@ -10,7 +10,6 @@ const SnackbarBox = ({notification}) => {
         setTimeout(()=>setOpen(false), 2000);
     }, [notification])
 
-    console.log("notification?.message", notification?.message);
     if (!notification?.message) {
         return null;
     }
