@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import SariskaMediaTransport from 'sariska-media-transport/build/SariskaMediaTransport';
 import ParticipantsGrid from '../../components/space/ParticipantsGrid';
-import PermissionDialog from '../../components/shared/PermissionDialog';
+//import PermissionDialog from '../../components/shared/PermissionDialog';
 import SnackbarBox from '../../components/shared/Snackbar';
 import { setAudioLevel } from '../../store/actions/audioIndicator';
 import { unreadMessage } from '../../store/actions/chat';
@@ -33,14 +33,14 @@ const Space = () => {
     const layout = useSelector(state => state.layout);
     const notification = useSelector(state => state.notification);
     const [dominantSpeakerId, setDominantSpeakerId] = useState(null);
-    const [lobbyUserJoined, setLobbyUserJoined] = useState({});
+    //const [lobbyUserJoined, setLobbyUserJoined] = useState({});
     const [minimize, setMinimize] = useState(false);
     const profile = useSelector(state=>state.profile);
     const [requestToSpeak, setRequestToSpeak] = useState(null);
     const [muteAll, setMuteAll] = useState(false);
     
     const handleMuteAllClick = async() => {
-        for (let [key, value] of Object.entries(remoteTracks)) {
+        for (let key of Object.keys(remoteTracks)) {
            await conference.muteParticipant(key, "audio") 
         }
         dispatch(remoteTrackMutedChanged());
@@ -52,15 +52,15 @@ const Space = () => {
         setMinimize(!minimize);
     }
 
-    const allowLobbyAccess = () => {
-        conference.lobbyApproveAccess(lobbyUserJoined.id);
-        setLobbyUserJoined({});
-    }
+    // const allowLobbyAccess = () => {
+    //     conference.lobbyApproveAccess(lobbyUserJoined.id);
+    //     setLobbyUserJoined({});
+    // }
 
-    const denyLobbyAccess = () => {
-        conference.lobbyDenyAccess(lobbyUserJoined.id);
-        setLobbyUserJoined({});
-    }
+    // const denyLobbyAccess = () => {
+    //     conference.lobbyDenyAccess(lobbyUserJoined.id);
+    //     setLobbyUserJoined({});
+    // }
 
     const requestToSpeakAllow = ()=>{
         conference.sendEndpointMessage(requestToSpeak.participantId, { action: USER_SUB_ROLE_CHANGED, payload: {participantId: requestToSpeak.participantId, role: USER_ROLE.SPEAKER }});

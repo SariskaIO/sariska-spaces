@@ -1,6 +1,6 @@
 import { Fab, Stack, Tooltip, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
-import React, {useEffect} from "react";
+import React from "react";
 import { styled } from "@mui/material/styles";
 import img from "../../../assets/images/voice.gif";
 import { color } from "../../../assets/colors";
@@ -101,7 +101,6 @@ const ParticipantsSummary = ({ handleDialogue, handleLeave, handleMinimize, domi
   const profile = useSelector(state=>state.profile);
   const history = useHistory();
   const participants = useSelector(state=>state.participant);
-  const hosts = participants.filter(item=>item._properties?.subRole === USER_ROLE.HOST);
   const others = participants.filter(item=>item._properties?.subRole !== USER_ROLE.HOST);
   const [audioTrack] = useSelector(state => state.localTrack);
   const remoteTracks = useSelector(state => state.remoteTrack);

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   Avatar,
   Box,
-  Button,
   Divider,
   List,
   ListItem,
@@ -14,10 +13,7 @@ import {
 
 import { styled } from "@mui/material/styles";
 import { useSelector } from "react-redux";
-import CloseOnlyDialogueHeader from "../../components/shared/CloseOnlyDialogueHeader";
-import ContentBox from "../../components/shared/ContentBox";
 import { color } from "../../assets/colors";
-import { Link, useHistory, useParams } from "react-router-dom";
 import GoBack from "../../components/shared/GoBack";
 import ParticipantTypeList from "../../components/shared/ParticipantTypeList";
 
@@ -58,23 +54,12 @@ const StyledCoHosts = styled(Typography)(({ theme }) => ({
   flexDirection: "row",
 }));
 
-const Count = styled(Typography)(({ theme }) => ({
-  color: color.text,
-  cursor: 'pointer'
-}));
 
 const Dot = styled(Typography)(({ theme }) => ({
   color: color.text,
   marginLeft: theme.spacing(1),
   marginRight: theme.spacing(1),
   marginTop: theme.spacing(-0.5),
-}));
-
-const StyledButton = styled(Link)(({ theme }) => ({
-    textTransform: 'capitalize',
-    fontSize: '1rem',
-    textDecoration: 'none',
-    color: color.blue
 }));
 
 const StyledDivider = styled(Divider)(({ theme }) => ({
@@ -84,8 +69,6 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
 
 const InviteMembers = ({handleClose}) => {
       const profile = useSelector((state) => state.profile);
-      const history = useHistory();
-      const queryParams = useParams();
       const participants = useSelector(state=>state.participant);
       const [openCohostList, setOpenCohostList] = useState(false);
       const [openSpeakerList, setOpenSpeakerList] = useState(false);

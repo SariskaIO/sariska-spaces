@@ -15,7 +15,7 @@ import SariskaMediaTransport from "sariska-media-transport/build/SariskaMediaTra
 import MicNoneOutlinedIcon from "@mui/icons-material/MicNoneOutlined";
 import MicOffOutlinedIcon from "@mui/icons-material/MicOffOutlined";
 import { color } from "../../assets/colors";
-import { getRandomColor, getToken, getUserName, getUserRole } from "../../utils";
+import { getRandomColor, getToken } from "../../utils";
 import { addConnection } from "../../store/actions/connection";
 import { setDisconnected } from "../../store/actions/layout";
 import { setProfile, addSpaceTitle, addSubRole, addSpaceType } from "../../store/actions/profile";
@@ -25,7 +25,7 @@ import { localTrackMutedChanged } from "../../store/actions/track";
 import RootButton from "../../components/shared/RootButton";
 import ContentBox from "../../components/shared/ContentBox";
 import CloseOnlyDialogueHeader from "../../components/shared/CloseOnlyDialogueHeader";
-import Switches from "../../components/shared/Switch";
+//import Switches from "../../components/shared/Switch";
 import SelectMenu from "../../components/shared/SelectMenu";
 import { localParticipantData } from "../../data";
 import { USER_ROLE } from "../../constants";
@@ -81,8 +81,8 @@ const StartSpace = () => {
   const [spaceTitle, setSpaceTitle] = useState("");
   const [buttonText, setButtonText] = useState("Create Stage");
   const [accessDenied, setAccessDenied] = useState(false);
-  const [userId, setUserId] = useState(null);
-  const [checked, setChecked] = React.useState(false);
+  const [userId, setUserId] = useState('xd4bvsf1');
+  //const [checked, setChecked] = React.useState(false);
   const profile = useSelector((state) => state.profile);
   const queryParams = useParams();
   const urlSearchParams = new URLSearchParams(window.location.search);
@@ -199,7 +199,7 @@ const StartSpace = () => {
     if (queryParams.spaceId) {
       setButtonText("Join Stage");
       setSpaceTitle(queryParams.spaceId);
-      setChecked(spaceType);
+      //setChecked(spaceType);
     }
     setUserId(profile?.id);
   }, [profile]);

@@ -7,7 +7,6 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import SmsIcon from '@mui/icons-material/Sms';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CopyLink from '../CopyLink';
-import { useHistory } from 'react-router-dom';
 import { useSelector } from "react-redux";
 import { USER_ROLE } from '../../../constants';
 
@@ -24,9 +23,6 @@ export default function SettingsMenu({ anchorEl, open, setAnchorEl }) {
   const [copySuccessSpeaker, setCopySuccessSpeaker] = React.useState('Copy to Invite Speaker');
   const [copySuccessListener, setCopySuccessListener] = React.useState('Copy to Listener');
   const profile = useSelector(state => state.profile);
-
-
-  const history = useHistory();
 
   const handleTweet = () => {
     if (profile.subRole === USER_ROLE.HOST || profile.subRole === USER_ROLE.CO_HOST) {
@@ -65,10 +61,6 @@ export default function SettingsMenu({ anchorEl, open, setAnchorEl }) {
     setCopySuccessCoHost("Copy to Invite Co-host");
     setCopySuccessSpeaker("Copy to Invite Speaker");
     setCopySuccessListener("Copy to Listener");
-  }
-
-  const inviteMenu = () => {
-    history.push('/invite');
   }
 
   return (

@@ -2,7 +2,6 @@ import React from "react";
 import {
   Avatar,
   Box,
-  Button,
   Divider,
   List,
   ListItem,
@@ -15,7 +14,6 @@ import { styled } from "@mui/material/styles";
 import { useSelector } from "react-redux";
 import CloseOnlyDialogueHeader from "../../components/shared/CloseOnlyDialogueHeader";
 import ContentBox from "../../components/shared/ContentBox";
-import { color } from "../../assets/colors";
 
 const CloseBox = styled(Box)(({ theme }) => ({
   position: "absolute",
@@ -40,21 +38,7 @@ const StyledListItem = styled(ListItem)(({ theme }) => ({
   paddingLeft: "0px",
   paddingRight: "0px",
 }));
-const StyledCoHosts = styled(Typography)(({ theme }) => ({
-  color: color.text,
-  display: "flex",
-  flexDirection: "row",
-}));
-const Dot = styled(Typography)(({ theme }) => ({
-  color: color.text,
-  marginLeft: theme.spacing(1),
-  marginRight: theme.spacing(1),
-  marginTop: theme.spacing(-0.5),
-}));
-const StyledButton = styled(Button)(({ theme }) => ({
-  textTransform: 'capitalize',
-  fontSize: '1rem'
-}));
+
 const StyledDivider = styled(Divider)(({ theme }) => ({
   marginBottom: theme.spacing(0.5),
   marginTop: theme.spacing(1),

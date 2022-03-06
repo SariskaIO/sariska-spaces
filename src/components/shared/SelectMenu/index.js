@@ -38,9 +38,8 @@ export default function SelectMenu({userId, handleChange, list}) {
           onChange={handleChange}
           placeholder="Pick Your Name"
         >
-          <MenuItem value="">Pick Your Name</MenuItem>
           {list.map((item, index) => (
-              <MenuItem value={item.id}>{item.name}</MenuItem>
+              <MenuItem value={item.id} key={index}>{item.name}</MenuItem>
           ))}
         </StyledSelect>
       </FormControl>

@@ -67,10 +67,8 @@ export async function getToken(roomName, profile, name, isModerator) {
 
     try {
         const response = await fetch(GENERATE_TOKEN_URL, body);
-        console.log('respon', response)
         if (response.ok) {
             const json = await response.json();
-            console.log('respo', json)
             localStorage.setItem(`sariska_${roomName}${name}`, json.token);
             return json.token;
         } else {

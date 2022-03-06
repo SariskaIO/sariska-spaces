@@ -1,8 +1,7 @@
 import Box from '@mui/material/Box';
 import React from 'react';
 import {styled} from '@mui/material/styles';
-import { Stack, Button, Fab, Tooltip } from '@mui/material';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { Stack, Fab, Tooltip } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { color } from '../../../assets/colors';
 import {useHistory} from 'react-router-dom';
@@ -13,15 +12,15 @@ const StyledBox = styled(Box)(()=>({
     display: 'flex',
     justifyContent: 'end',
     marginTop: '10px'
-}))
-const IconButton = styled(Fab)(({theme})=>({
-    height:'28px',
-    width: '28px',
-    lineHeight: '10px',
-    minHeight: '25px',
-    color: color.gray,
-    marginRight: theme.spacing(1),
-}))
+ }))
+// const IconButton = styled(Fab)(({theme})=>({
+//     height:'28px',
+//     width: '28px',
+//     lineHeight: '10px',
+//     minHeight: '25px',
+//     color: color.gray,
+//     marginRight: theme.spacing(1),
+// }))
 const StyledFab = styled(Fab)(()=>({
     height:'28px',
     width: '28px',

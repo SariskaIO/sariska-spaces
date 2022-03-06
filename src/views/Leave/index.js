@@ -1,9 +1,7 @@
-
-import React, {useEffect} from 'react'
+import React from 'react'
 import { Box, Typography } from "@mui/material";
 import {Link, useParams} from 'react-router-dom';
 import { styled } from "@mui/material/styles";
-import {useSelector} from "react-redux";
 import { color } from '../../assets/colors';
 
     const StyledBox = styled(Box)(({theme}) => ({

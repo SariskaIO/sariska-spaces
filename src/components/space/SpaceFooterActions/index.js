@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import { Fab, Stack, styled, Tooltip } from "@mui/material";
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import PanToolOutlinedIcon from "@mui/icons-material/PanToolOutlined";
-import MicNoneOutlinedIcon from "@mui/icons-material/MicNoneOutlined";
-import MicOffOutlinedIcon from "@mui/icons-material/MicOffOutlined";
+//import MicNoneOutlinedIcon from "@mui/icons-material/MicNoneOutlined";
+//import MicOffOutlinedIcon from "@mui/icons-material/MicOffOutlined";
 import VolumeUpOutlinedIcon from "@mui/icons-material/VolumeUpOutlined";
-import VolumeOffOutlinedIcon from "@mui/icons-material/VolumeOffOutlined";
+//import VolumeOffOutlinedIcon from "@mui/icons-material/VolumeOffOutlined";
 import SettingsMenu from "../../shared/SettingsMenu";
 import { color } from "../../../assets/colors";
-import { useDispatch, useSelector } from "react-redux";
-import { localTrackMutedChanged, remoteTrackMutedChanged } from "../../../store/actions/track";
-import { useHistory, useParams } from 'react-router-dom';
+import { useSelector } from "react-redux";
+//import { localTrackMutedChanged } from "../../../store/actions/track";
 import BasicDialogue from "../../shared/BasicDialogue";
 
 const StyledFab = styled(Fab)(({ theme }) => ({
@@ -26,15 +25,13 @@ const StyledFab = styled(Fab)(({ theme }) => ({
   },
 }));
 const SpaceFooterActions = ({dominantSpeakerId, setLocalHandRaise, muteAll, handleMuteAllClick}) => {
-    const [audioTrack] = useSelector(state => state.localTrack);
-    const remoteTracks = useSelector(state => state.remoteTrack);
+    //const [audioTrack] = useSelector(state => state.localTrack);
+    //const remoteTracks = useSelector(state => state.remoteTrack);
     const [raiseHand, setRaiseHand] = useState(false);
     const conference = useSelector(state=>state.conference);
     const [inviteOpen, setInviteOpen] = useState(false);
-    const dispatch = useDispatch()
-    const queryParams = useParams();
-    const participants = useSelector(state=>state.participant);
-    const profile = useSelector((state) => state.profile);
+    //const dispatch = useDispatch()
+    //const profile = useSelector((state) => state.profile);
   
 
   const handleClickInviteOpen = () => {
@@ -61,23 +58,18 @@ const SpaceFooterActions = ({dominantSpeakerId, setLocalHandRaise, muteAll, hand
   //   setMuteAll(true);
   // }
 
-  const muteAudio = async () => {
-      await audioTrack?.mute();
-      dispatch(localTrackMutedChanged());
-  };
+  // const muteAudio = async () => {
+  //     await audioTrack?.mute();
+  //     dispatch(localTrackMutedChanged());
+  // };
 
-  const unmuteAudio = async () => {
-      await audioTrack?.unmute();
-      dispatch(localTrackMutedChanged());
-  };
-
-  const handleManageSpace = () => {
-    history.push(`/invite/${queryParams.spaceId}`);
-  }
+  // const unmuteAudio = async () => {
+  //     await audioTrack?.unmute();
+  //     dispatch(localTrackMutedChanged());
+  // };
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const history = useHistory();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);

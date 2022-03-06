@@ -1,6 +1,6 @@
 import { Box, Divider, Stack, styled, Typography } from "@mui/material";
-import React, {useEffect, useState} from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, {useState} from "react";
+import { useSelector } from "react-redux";
 import { color } from "../../../assets/colors";
 import { REQUEST_TO_SPEAK, USER_ROLE, USER_SUB_ROLE_CHANGED } from "../../../constants";
 import AvatarBox from "../AvatarBox";
@@ -38,10 +38,10 @@ const AvatarContainerBox = styled(Box)(({ theme }) => ({
 }));
 
 const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
-  const [contextHostMenu, setContextHostMenu] = React.useState(null);
-  const [contextCoHostMenu, setContextCoHostMenu] = React.useState(null);
-  const [contextSpeakerMenu, setContextSpeakerMenu] = React.useState(null);
-  const [contextListenerMenu, setContextListenerMenu] = React.useState(null);
+  const [contextHostMenu, setContextHostMenu] = useState(null);
+  const [contextCoHostMenu, setContextCoHostMenu] = useState(null);
+  const [contextSpeakerMenu, setContextSpeakerMenu] = useState(null);
+  const [contextListenerMenu, setContextListenerMenu] = useState(null);
   const spaceTitle = useSelector((state) => state.profile?.spaceTitle);
   const conference = useSelector((state) => state.conference);
   const profile = useSelector((state) => state.profile);
@@ -164,11 +164,11 @@ const ParticipantsList = ({ dominantSpeakerId, localHandRaise }) => {
     setContextListenerMenu(null);
   };
 
-  const handleClose = () => {
-    setContextCoHostMenu(null);
-    setContextSpeakerMenu(null);
-    setContextListenerMenu(null);
-  };
+  // const handleClose = () => {
+  //   setContextCoHostMenu(null);
+  //   setContextSpeakerMenu(null);
+  //   setContextListenerMenu(null);
+  // };
 
   const hostMenu = {
     host: []

@@ -24,9 +24,9 @@ const StyledTextField = styled(TextField)(({theme})=>({
         }
 }))
 
-const StyledIcon = styled(Grid)(({theme})=>({
-    background: `${color.yellow}`
-}))
+// const StyledIcon = styled(Grid)(({theme})=>({
+//     background: `${color.yellow}`
+// }))
 
 const StyledButton = styled(Button)(({theme})=>({
     color: `${color.primary}`, 

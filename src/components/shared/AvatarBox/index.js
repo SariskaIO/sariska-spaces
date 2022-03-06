@@ -1,9 +1,7 @@
 import React from 'react';
 import { Avatar, Box, Stack, styled, Typography} from '@mui/material'
 import { color } from '../../../assets/colors';
-import img from '../../../assets/images/voice.gif';
 import { useSelector } from 'react-redux';
-import Audio from '../Audio';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import { USER_ROLE } from '../../../constants';
 
