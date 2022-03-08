@@ -52,7 +52,7 @@ const SpaceTerms = () => {
     if (queryParams.spaceId && userRole !== undefined && spaceType  !== undefined) {
       history.push(`/start/${queryParams.spaceId}?spacetype=${spaceType}&role=${userRole}`);
     } else if ( queryParams.spaceId ) {
-      history.push(`/start/${queryParams.spaceId}`);
+      history.push(`/start/${queryParams.spaceId}?spacetype=${spaceType}&role=${userRole}`);
     } else {
       history.push("/start");
     }

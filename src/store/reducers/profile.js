@@ -1,14 +1,12 @@
-import { SET_PROFILE, SET_SUB_ROLE, SET_SPACE_TITLE, SET_SPACE_TYPE} from "../actions/types";
-
-const persistedData = JSON.parse(localStorage.getItem("reduxState") || "{}");
+import { SET_PROFILE, SET_SUB_ROLE, SET_SPACE_TITLE, SET_SPACE_TYPE, SET_NAME} from "../actions/types";
 
 const initialState = {
-    name: persistedData.name,
+    name: '',
     spaceTitle: '',
-    avatar: persistedData.avatar,
-    role: persistedData.role,
-    id: persistedData.id,
-    subRole: persistedData.subRole,
+    avatar: '',
+    role: '',
+    id: '',
+    subRole: '',
     spaceType: "public"
 };
 
@@ -30,6 +28,9 @@ export const profile = (state = initialState, action) => {
         case SET_SPACE_TYPE:
             state.spaceType = action.payload;
             return {...state};     
+        case SET_NAME:
+            state.name = action.payload;
+            return {...state};                 
         default:
             return state
     }

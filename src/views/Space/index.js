@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import SariskaMediaTransport from 'sariska-media-transport/build/SariskaMediaTransport';
+import SariskaMediaTransport from 'sariska-media-transport';
 import ParticipantsGrid from '../../components/space/ParticipantsGrid';
-//import PermissionDialog from '../../components/shared/PermissionDialog';
+import PermissionDialog from '../../components/shared/PermissionDialog';
 import SnackbarBox from '../../components/shared/Snackbar';
 import { setAudioLevel } from '../../store/actions/audioIndicator';
 import { unreadMessage } from '../../store/actions/chat';
@@ -33,7 +33,7 @@ const Space = () => {
     const layout = useSelector(state => state.layout);
     const notification = useSelector(state => state.notification);
     const [dominantSpeakerId, setDominantSpeakerId] = useState(null);
-    //const [lobbyUserJoined, setLobbyUserJoined] = useState({});
+    const [lobbyUserJoined, setLobbyUserJoined] = useState({});
     const [minimize, setMinimize] = useState(false);
     const profile = useSelector(state=>state.profile);
     const [requestToSpeak, setRequestToSpeak] = useState(null);
@@ -52,15 +52,15 @@ const Space = () => {
         setMinimize(!minimize);
     }
 
-    // const allowLobbyAccess = () => {
-    //     conference.lobbyApproveAccess(lobbyUserJoined.id);
-    //     setLobbyUserJoined({});
-    // }
+    const allowLobbyAccess = () => {
+        conference.lobbyApproveAccess(lobbyUserJoined.id);
+        setLobbyUserJoined({});
+    }
 
-    // const denyLobbyAccess = () => {
-    //     conference.lobbyDenyAccess(lobbyUserJoined.id);
-    //     setLobbyUserJoined({});
-    // }
+    const denyLobbyAccess = () => {
+        conference.lobbyDenyAccess(lobbyUserJoined.id);
+        setLobbyUserJoined({});
+    }
 
     const requestToSpeakAllow = ()=>{
         conference.sendEndpointMessage(requestToSpeak.participantId, { action: USER_SUB_ROLE_CHANGED, payload: {participantId: requestToSpeak.participantId, role: USER_ROLE.SPEAKER }});
@@ -76,16 +76,10 @@ const Space = () => {
         if (!window.navigator.onLine) {
             dispatch(showNotification({
                 message: "You lost your internet connection. Trying to reconnect...",
-                severity: "info",
-                autoHide: false
+                severity: "info"
             }));
         }
-        setTimeout(() => {
-            if (window.navigator.onLine && !layout.disconnected) {
-                dispatch(showNotification({message: "Internet Recovered!!!", autoHide: true, severity: "info"}));
-            }
-        }, 6000);
-        SariskaMediaTransport.setNetworkInfo({isOnline: window.navigator.onLine});
+        SariskaMediaTransport.setNetworkInfo({ isOnline: window.navigator.onLine });
     };
 
     const destroy = async () => {
@@ -174,6 +168,11 @@ const Space = () => {
             dispatch(setAudioLevel({participantId, audioLevel}));
         });
 
+        conference.addEventListener(SariskaMediaTransport.events.conference.LOBBY_USER_JOINED, (id, displayName) => {
+            new Audio("https://sdk.sariska.io/knock_0b1ea0a45173ae6c10b084bbca23bae2.ogg").play();
+            setLobbyUserJoined({ id, displayName });
+        });
+
         conference.addEventListener(SariskaMediaTransport.events.conference.ENDPOINT_MESSAGE_RECEIVED, async ( participant, data) => {     
             const { action, payload } = data;
             if ( action === USER_SUB_ROLE_CHANGED) {
@@ -220,10 +219,10 @@ const Space = () => {
             {!minimize && <ParticipantsGrid dominantSpeakerId={dominantSpeakerId} handleMinimize={handleMinimize} />}
             <ParticipantsSummary handleMinimize={handleMinimize}/>
             {!minimize && <ParticipantsGrid dominantSpeakerId={dominantSpeakerId} handleMinimize={handleMinimize} muteAll={muteAll} handleMuteAllClick={handleMuteAllClick}/>}
-            {/* {lobbyUserJoined.id && <PermissionDialog
+            {lobbyUserJoined.id && <PermissionDialog
                 denyLobbyAccess={denyLobbyAccess}
                 allowLobbyAccess={allowLobbyAccess}
-                displayName={lobbyUserJoined.displayName}/>} */}
+                displayName={lobbyUserJoined.displayName}/>}
             <ParticipantsSummary dominantSpeakerId={dominantSpeakerId} handleMinimize={handleMinimize} muteAll={muteAll} handleMuteAllClick={handleMuteAllClick}/>
             <SnackbarBox notification={notification}/>
             <ReconnectDialog open={layout.disconnected}/>

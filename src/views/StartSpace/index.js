@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useDispatch, useSelector } from "react-redux";
-import SariskaMediaTransport from "sariska-media-transport/build/SariskaMediaTransport";
+import SariskaMediaTransport from "sariska-media-transport";
 import MicNoneOutlinedIcon from "@mui/icons-material/MicNoneOutlined";
 import MicOffOutlinedIcon from "@mui/icons-material/MicOffOutlined";
 import { color } from "../../assets/colors";
@@ -81,7 +81,7 @@ const StartSpace = () => {
   const [spaceTitle, setSpaceTitle] = useState("");
   const [buttonText, setButtonText] = useState("Create Stage");
   const [accessDenied, setAccessDenied] = useState(false);
-  const [userId, setUserId] = useState('xd4bvsf1');
+  const [name, setName] = useState("");
   //const [checked, setChecked] = React.useState(false);
   const profile = useSelector((state) => state.profile);
   const queryParams = useParams();
@@ -90,8 +90,7 @@ const StartSpace = () => {
   let userRole = Object.fromEntries(urlSearchParams?.entries())?.role || profile?.subRole
 
   const handleNameChange = (event) => {
-    setUserId(event.target.value);
-    dispatch(setProfile(localParticipantData.find(item => item.id === event.target.value)));
+    setName(event.target.value)
   };
 
   const handleSpaceChange = (event) => {
@@ -106,15 +105,15 @@ const StartSpace = () => {
     }
 
     setLoading(true);
-    
+
     const isModerator = !queryParams.spaceId || userRole === USER_ROLE.HOST || userRole === USER_ROLE.CO_HOST;
-    const token = await getToken(profile, userId, isModerator);
+    token = await getToken(name, isModerator);
 
     if (!token) {
       return;
     } 
 
-    const connection = new SariskaMediaTransport.JitsiConnection(token);
+    const connection = new SariskaMediaTransport.JitsiConnection(token, spaceTitle);
     connection.addEventListener(SariskaMediaTransport.events.connection.CONNECTION_ESTABLISHED, () => {
       dispatch(addConnection(connection));
       createConference(connection);
@@ -158,7 +157,7 @@ const StartSpace = () => {
         dispatch(addSubRole(userRole));
       }
       dispatch(addParticipant({_identity: { user: conference.getLocalUser() }, _id: conference.myUserId(), _properties }));
-      history.push(`/${spaceTitle}`);
+      history.push(`/${spaceTitle}?spacetype=${spaceType}&role=${userRole}`);
     });
 
     conference.addEventListener(SariskaMediaTransport.events.conference.CONFERENCE_ERROR, () => {
@@ -172,11 +171,17 @@ const StartSpace = () => {
       }
     });
 
+    conference.addEventListener(SariskaMediaTransport.events.conference.USER_ROLE_CHANGED, (id) => {
+      if (conference.isModerator()) {
+          conference.enableLobby();
+      }
+  });
+
     conference.addEventListener(SariskaMediaTransport.events.conference.CONFERENCE_FAILED, async (error) => {
-      // if (error === SariskaMediaTransport.errors.conference.MEMBERS_ONLY_ERROR) {
-      //   setButtonText("Asking to join");
-      //   conference.joinLobby(getUserName(localParticipantData, userId));
-      // }
+      if (error === SariskaMediaTransport.errors.conference.MEMBERS_ONLY_ERROR) {
+        setButtonText("Asking to join");
+        conference.joinLobby(name);
+      }
 
       if (error === SariskaMediaTransport.errors.conference.CONFERENCE_ACCESS_DENIED) {
         setAccessDenied(true);
@@ -202,9 +207,8 @@ const StartSpace = () => {
     if (queryParams.spaceId) {
       setButtonText("Join Stage");
       setSpaceTitle(queryParams.spaceId);
-      //setChecked(spaceType);
     }
-    setUserId(profile?.id);
+    setName(profile?.name);
   }, [profile]);
 
 
@@ -241,7 +245,18 @@ const StartSpace = () => {
             noValidate
             autoComplete="off"
           >
-            <SelectMenu userId={userId} handleChange={handleNameChange} list={localParticipantData} />
+            <StyledTextField
+              id="filled-number-1"
+              label="Your Name"
+              type="text"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              variant="standard"
+              value={name}
+              onChange={handleNameChange}
+              sx={{ color: "red !important" }}
+            />
             <StyledTextField
               id="filled-number"
               label="Name Your Stage"
@@ -254,7 +269,6 @@ const StartSpace = () => {
               onChange={handleSpaceChange}
               sx={{ color: "red !important" }}
             />
-            {/* <Switches disabled={queryParams.spaceId ? true : false} setChecked={setChecked} checked={checked} /> */}
           </Box>
           {userRole !== USER_ROLE.LISTENER && (<AudioBox>
             {audioTrack?.isMuted() ? (
