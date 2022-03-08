@@ -1,5 +1,5 @@
 
-import { Alert, Box , Snackbar} from "@mui/material";
+import { Alert, Snackbar} from "@mui/material";
 import React, {useEffect, useState} from 'react'
 
 
@@ -10,7 +10,6 @@ const SnackbarBox = ({notification}) => {
         setTimeout(()=>setOpen(false), 2000);
     }, [notification])
 
-    console.log("notification?.message", notification?.message);
     if (!notification?.message) {
         return null;
     }

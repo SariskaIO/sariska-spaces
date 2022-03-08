@@ -19,11 +19,11 @@ const StyledListItemText = styled(ListItemText)(({theme})=>({
 
 export default function FolderList({data, background}) {
   return (
-    <List sx={{ width: '100%', maxWidth: 360}, !background ? {bgcolor: 'background.paper'}: {bgcolor: 'none'}}>
+    <List sx={{ width: '100%', maxWidth: 360, bgcolor: !background ? 'background.paper' : 'none' }}>
         {data.map((item, index)=>(
       <ListItem key={index}>
         <ListItemAvatar>
-          <Avatar sx={{color: color.yellow, background: 'none', border: `1px solid ${color.yellow}`}}>
+          <Avatar sx={{color: color.primary, background: 'none', border: `1px solid ${color.primary}`}}>
             {item.icon}
           </Avatar>
         </ListItemAvatar>
