@@ -204,6 +204,7 @@ const Space = () => {
         window.addEventListener("offline", updateNetwork);
         window.addEventListener("online", updateNetwork);
         window.addEventListener("beforeunload", destroy);
+        SariskaMediaTransport.effects.createRnnoiseProcessor();
     return () => {
         destroy();
     };
