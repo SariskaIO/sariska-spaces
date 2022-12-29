@@ -24,7 +24,7 @@ export default function PermissionDialog({displayName, allowLobbyAccess, denyLob
     return (
         <Root>
             <Card>
-                <div>Someone wants to join {displayName}</div>
+                <div>{displayName} wants to join </div>
                 <Controls>
                     <Button onClick={denyLobbyAccess}>Deny</Button>
                     <Button onClick={allowLobbyAccess}>Allow</Button>

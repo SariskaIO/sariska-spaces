@@ -6,13 +6,13 @@ import img from "../../../assets/images/voice.gif";
 import { color } from "../../../assets/colors";
 import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
-import {useHistory} from 'react-router-dom';
+import { useHistory } from "react-router-dom";
 import { USER_ROLE } from "../../../constants";
 import { clearAllReducers } from "../../../store/actions/conference";
 import MicNoneOutlinedIcon from "@mui/icons-material/MicNoneOutlined";
 import MicOffOutlinedIcon from "@mui/icons-material/MicOffOutlined";
 import { localTrackMutedChanged } from "../../../store/actions/track";
-import Audio from  "../../shared/Audio";
+import Audio from "../../shared/Audio";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   background: color.gray,
@@ -42,12 +42,12 @@ const Title = styled(Typography)(({ theme }) => ({
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
-  textTransform: 'capitalize'
+  textTransform: "capitalize",
 }));
 const StyledFab = styled(Fab)(() => ({
-  position: 'absolute',
-  bottom: '75px',
-  right: '30px',
+  position: "absolute",
+  bottom: "75px",
+  right: "30px",
   height: "28px",
   width: "28px",
   lineHeight: "28px",
@@ -70,9 +70,9 @@ const StyledFab = styled(Fab)(() => ({
   },
 }));
 const StyledAudioFab = styled(Fab)(() => ({
-  position: 'absolute',
-  bottom: '15px',
-  right: '30px',
+  position: "absolute",
+  bottom: "15px",
+  right: "30px",
   height: "28px",
   width: "28px",
   lineHeight: "28px",
@@ -97,24 +97,33 @@ const StyledAudioFab = styled(Fab)(() => ({
 const StyledCaption = styled(Typography)(() => ({
   fontSize: "0.6rem",
 }));
-const ParticipantsSummary = ({ handleDialogue, handleLeave, handleMinimize, dominantSpeakerId, muteAll, handleMuteAllClick }) => {
-  const profile = useSelector(state=>state.profile);
+const ParticipantsSummary = ({
+  handleDialogue,
+  handleLeave,
+  handleMinimize,
+  dominantSpeakerId,
+  muteAll,
+  handleMuteAllClick,
+}) => {
+  const profile = useSelector((state) => state.profile);
   const history = useHistory();
-  const participants = useSelector(state=>state.participant);
-  const others = participants.filter(item=>item._properties?.subRole !== USER_ROLE.HOST);
-  const [audioTrack] = useSelector(state => state.localTrack);
-  const remoteTracks = useSelector(state => state.remoteTrack);
+  const participants = useSelector((state) => state.participant);
+  const others = participants.filter(
+    (item) => item._properties?.subRole !== USER_ROLE.HOST
+  );
+  const [audioTrack] = useSelector((state) => state.localTrack);
+  const remoteTracks = useSelector((state) => state.remoteTrack);
   const dispatch = useDispatch();
-  
+
   const muteAudio = async () => {
     await audioTrack?.mute();
     dispatch(localTrackMutedChanged());
-};
+  };
 
-const unmuteAudio = async () => {
+  const unmuteAudio = async () => {
     await audioTrack?.unmute();
     dispatch(localTrackMutedChanged());
-};
+  };
 
   const leaveConference = () => {
     history.push("/leave");
@@ -139,21 +148,27 @@ const unmuteAudio = async () => {
               >
                 <Stack direction="row" alignItems="center">
                   <img height="40" src={img} alt="voice" />
-                    {
-                      participants.map((participant, index)=>{
-                        return (
-                         (participant?._id === dominantSpeakerId) && <Name>
-                            { participant?._identity?.user?.name }  {" "}
-                            <StyledCaption variant="caption">({ participant?._properties.subRole})</StyledCaption> 
-                          </Name>
-                      )})
-                    }
+                  {participants.map((participant, index) => {
+                    return (
+                      participant?._id === dominantSpeakerId && (
+                        <Name>
+                          {participant?._identity?.user?.name}{" "}
+                          <StyledCaption variant="caption">
+                            ({participant?._properties.subRole})
+                          </StyledCaption>
+                        </Name>
+                      )
+                    );
+                  })}
                 </Stack>
-                { others.length > 0 ? <Name>+ {others.length} others</Name>: <Name>No one else is here</Name> }
+                {others.length > 0 ? (
+                  <Name>+ {others.length} others</Name>
+                ) : (
+                  <Name>No one else is here</Name>
+                )}
               </Stack>
             </Stack>
             <Title>{profile.spaceTitle}</Title>
-            
           </Stack>
         </Stack>
       </StyledBox>
@@ -165,22 +180,39 @@ const unmuteAudio = async () => {
         <CloseIcon />
       </StyledFab>
       {profile.subRole === "listener" ? (
-      <Tooltip title="listeners are muted" placement="top" arrow>
-        <StyledAudioFab sx={{zIndex: "9999"}}>
-                    <MicOffOutlinedIcon />
-        </StyledAudioFab>
-      </Tooltip>)
-      : (
-        <Tooltip title={audioTrack?.isMuted() ? "Unmute Audio" : "Mute Audio"} placement="top" arrow>
-        <StyledAudioFab sx={audioTrack?.isMuted() && {background: color.primary, '&:hover': {background: color.primary, opacity: '0.8'}}} onClick={audioTrack?.isMuted() ?
-                    unmuteAudio : muteAudio}>
-        {audioTrack?.isMuted() ?
-                    <MicOffOutlinedIcon /> : <MicNoneOutlinedIcon />}
-        </StyledAudioFab>
-      </Tooltip>)}
-      {Object.entries(remoteTracks).map(([key, value]) => <Audio track={value?.find(track => track.isAudioTrack())} />)}          
+        <Tooltip title="listeners are muted" placement="top" arrow>
+          <StyledAudioFab sx={{ zIndex: "9999" }}>
+            <MicOffOutlinedIcon />
+          </StyledAudioFab>
+        </Tooltip>
+      ) : (
+        <Tooltip
+          title={audioTrack?.isMuted() ? "Unmute Audio" : "Mute Audio"}
+          placement="top"
+          arrow
+        >
+          <StyledAudioFab
+            sx={
+              audioTrack?.isMuted() && {
+                background: color.primary,
+                "&:hover": { background: color.primary, opacity: "0.8" },
+              }
+            }
+            onClick={audioTrack?.isMuted() ? unmuteAudio : muteAudio}
+          >
+            {audioTrack?.isMuted() ? (
+              <MicOffOutlinedIcon />
+            ) : (
+              <MicNoneOutlinedIcon />
+            )}
+          </StyledAudioFab>
+        </Tooltip>
+      )}
+      {Object.entries(remoteTracks).map(([key, value]) => (
+        <Audio track={value?.find((track) => track.isAudioTrack())} />
+      ))}
     </>
   );
-};   
+};
 
 export default ParticipantsSummary;
